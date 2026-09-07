@@ -12,6 +12,9 @@ GitHub Rewind turns a year of GitHub activity into a visual review of commits, p
 - Collect product feedback when PostgreSQL is configured
 - Rate-limited and bot-protected with Arcjet
 
+## Screenshots
+<img width="1209" height="583" alt="Screenshot 2026-09-07 121223" src="https://github.com/user-attachments/assets/475d2451-2c02-4142-92f3-b75344ee1160" />
+
 ## Stack
 
 - Next.js and React
