@@ -57,13 +57,13 @@ export function InsightsPanel({ data }: { data: RewindData }) {
         return (
             <Panel className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--elevated)] text-primary">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-elevated text-primary">
                         <Brain className="size-5" />
                     </span>
                     <div>
                         <h3 className="text-sm font-semibold tracking-tight">AI year-in-review</h3>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                            Turn these numbers into a professional narrative — persona, highlights,
+                            Turn these numbers into a professional narrative - persona, highlights,
                             growth areas and a ready-to-post caption.
                         </p>
                         {insightsError ? (

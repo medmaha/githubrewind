@@ -29,7 +29,7 @@ type RewindState = {
 export const useRewindStore = create<RewindState>((set) => ({
     username: "",
     year: new Date().getUTCFullYear(),
-    // Token lives in memory only — never persisted to storage.
+    // Token lives in memory only - never persisted to storage.
     token: "",
     status: "idle",
     error: null,

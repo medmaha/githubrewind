@@ -57,7 +57,7 @@ export function buildShareText(
     }
 
     const body = [
-        `${name}'s ${data.year} GitHub Rewind ${insights?.personaTitle ? `— ${insights.personaTitle}` : ""}`.trim(),
+        `${name}'s ${data.year} GitHub Rewind ${insights?.personaTitle ? `- ${insights.personaTitle}` : ""}`.trim(),
         "",
         insights?.yearlyOverview ?? insights?.headline ?? "",
         "",
@@ -67,13 +67,13 @@ export function buildShareText(
         `• ${nf(t.issues)} issues · ${nf(t.reviews)} reviews`,
         `• ${nf(t.repos)} repositories · ${nf(t.stars)} stars earned`,
         `• ~${nf(t.estimatedLinesOfCode)} lines of code (estimated)`,
-        `• Top languages: ${langs.join(", ") || "—"}`,
+        `• Top languages: ${langs.join(", ") || "-"}`,
         "",
         insights?.significantAchievements?.length
             ? `🏆 Highlights\n${insights.significantAchievements
-                  .slice(0, 3)
-                  .map((a) => `• ${a}`)
-                  .join("\n")}`
+                .slice(0, 3)
+                .map((a) => `• ${a}`)
+                .join("\n")}`
             : "",
         "",
         insights?.shareCaption ?? "",
@@ -103,6 +103,6 @@ export function shareUrl(platform: Platform, text: string, url: string): string 
         case "facebook":
             return `https://www.facebook.com/sharer/sharer.php?u=${u}&quote=${t}`;
         case "instagram":
-            return null; // Instagram has no web share intent — copy caption + download the card.
+            return null; // Instagram has no web share intent - copy caption + download the card.
     }
 }

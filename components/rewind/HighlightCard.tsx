@@ -297,7 +297,7 @@ export function HighlightCard({
             <PanelHeader
                 icon={<ImageIcon className="size-4" />}
                 title="Highlight card"
-                hint="1200×630 — sized for LinkedIn, X and Facebook previews"
+                hint="1200×630 - sized for LinkedIn, X and Facebook previews"
                 action={
                     <GhButton size="sm" onClick={download} disabled={rendering}>
                         {rendering ? (
@@ -309,7 +309,7 @@ export function HighlightCard({
                     </GhButton>
                 }
             />
-            <div className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--background)]">
+            <div className="overflow-hidden rounded-xl border border-border-strong bg-background">
                 <canvas
                     ref={canvasRef}
                     className="block h-auto w-full"
