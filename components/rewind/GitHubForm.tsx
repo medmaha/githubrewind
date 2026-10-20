@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import { GitBranch, KeyRound, Loader2, Search, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
