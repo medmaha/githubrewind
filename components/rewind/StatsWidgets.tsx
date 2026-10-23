@@ -125,7 +125,7 @@ export function ProfileWidget({ data }: { data: RewindData }) {
             <img
                 src={data.profile.avatarUrl}
                 alt={`${data.profile.login} avatar`}
-                className="size-16 rounded-2xl border border-border-strong sm:size-20"
+                className="size-16 rounded-full border border-border sm:size-20"
                 loading="lazy"
             />
             <div className="min-w-0 flex-1">
@@ -158,7 +158,7 @@ export function ProfileWidget({ data }: { data: RewindData }) {
                 </div>
             </div>
             <div className="shrink-0 text-right">
-                <div className="font-mono text-4xl font-bold text-gradient sm:text-5xl">
+                <div className="font-mono text-4xl font-semibold text-primary sm:text-5xl">
                     {data.year}
                 </div>
                 <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -274,7 +274,7 @@ export function ReposWidget({ data }: { data: RewindData }) {
                             href={repo.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-start justify-between gap-3 rounded-xl border border-transparent bg-(--elevated)/60 px-3 py-2.5 transition-colors hover:border-border-strong"
+                            className="flex items-start justify-between gap-3 rounded-md border border-border bg-background px-3 py-2.5 transition-colors hover:border-border-strong"
                         >
                             <span className="min-w-0">
                                 <span className="block truncate text-sm font-medium text-primary">
@@ -314,7 +314,7 @@ export function AchievementsWidget({ data }: { data: RewindData }) {
                 {data.achievements.map((a) => (
                     <div
                         key={a.id}
-                        className="rounded-xl border border-border bg-(--elevated)/60 p-3"
+                        className="rounded-md border border-border bg-background p-3"
                     >
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium">{a.title}</span>

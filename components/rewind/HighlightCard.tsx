@@ -309,7 +309,7 @@ export function HighlightCard({
                     </GhButton>
                 }
             />
-            <div className="overflow-hidden rounded-xl border border-border-strong bg-background">
+            <div className="overflow-hidden rounded-md border border-border bg-background">
                 <canvas
                     ref={canvasRef}
                     className="block h-auto w-full"

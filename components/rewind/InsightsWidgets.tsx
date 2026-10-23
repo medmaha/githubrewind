@@ -57,7 +57,7 @@ export function InsightsPanel({ data }: { data: RewindData }) {
         return (
             <Panel className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-elevated text-primary">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-md bg-elevated text-primary">
                         <Brain className="size-5" />
                     </span>
                     <div>

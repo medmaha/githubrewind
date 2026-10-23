@@ -44,10 +44,10 @@ export function SharePanel({ data, insights }: { data: RewindData; insights: AiI
                         type="button"
                         onClick={() => setPlatform(key)}
                         className={cn(
-                            "rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
+                            "rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
                             platform === key
-                                ? "border-primary/50 bg-primary/15 text-primary"
-                                : "border-[var(--border)] bg-[var(--elevated)]/60 text-muted-foreground hover:text-foreground",
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border bg-elevated text-muted-foreground hover:text-foreground",
                         )}
                         style={platform === key ? { borderColor: PLATFORMS[key].brand } : undefined}
                     >
@@ -61,7 +61,7 @@ export function SharePanel({ data, insights }: { data: RewindData; insights: AiI
                 value={text}
                 rows={10}
                 aria-label={`${meta.label} caption`}
-                className="mt-3 w-full resize-y rounded-xl border border-[var(--border-strong)] bg-[var(--background)]/60 p-3 font-mono text-xs leading-relaxed text-muted-foreground focus-visible:border-primary focus-visible:outline-none"
+                className="mt-3 w-full resize-y rounded-md border border-border bg-background p-3 font-mono text-xs leading-relaxed text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
             />
 
             <div className="mt-3 flex flex-wrap items-center gap-2">

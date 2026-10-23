@@ -5,7 +5,7 @@ export function Panel({ className, children, ...props }: React.HTMLAttributes<HT
     return (
         <div
             className={cn(
-                "surface glow-ring relative overflow-hidden p-4 sm:p-5",
+                "surface relative overflow-hidden p-4 sm:p-5",
                 "transition-colors duration-200 hover:border-border-strong",
                 className,
             )}
@@ -31,7 +31,7 @@ export function PanelHeader({
         <div className="mb-4 flex items-start justify-between gap-3">
             <div className="flex items-center gap-2.5">
                 {icon ? (
-                    <span className="grid size-8 place-items-center rounded-lg bg-elevated text-primary">
+                    <span className="grid size-8 place-items-center rounded-md bg-elevated text-muted-foreground">
                         {icon}
                     </span>
                 ) : null}
@@ -64,7 +64,7 @@ export function Chip({
     return (
         <span
             className={cn(
-                "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono text-[11px] leading-5",
+                "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs leading-4",
                 tones[tone],
                 className,
             )}
@@ -85,7 +85,7 @@ export function GhButton({
 }) {
     const variants = {
         primary:
-            "bg-[linear-gradient(180deg,var(--color-success),color-mix(in_oklch,var(--color-success)_78%,black))] text-[oklch(0.16_0.02_150)] font-semibold hover:brightness-110",
+            "border border-[color-mix(in_srgb,var(--success)_70%,black)] bg-success text-white font-medium hover:bg-[color-mix(in_srgb,var(--success)_88%,white)]",
         outline:
             "border border-[var(--border-strong)] bg-[var(--elevated)] text-foreground hover:bg-[color-mix(in_oklch,var(--elevated)_80%,white_6%)]",
         ghost: "text-muted-foreground hover:bg-[var(--elevated)] hover:text-foreground",
@@ -93,7 +93,7 @@ export function GhButton({
     return (
         <button
             className={cn(
-                "inline-flex items-center justify-center gap-2 rounded-lg text-sm transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "inline-flex items-center justify-center gap-2 rounded-md border border-transparent text-sm transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 size === "sm" ? "h-8 px-3" : "h-10 px-4",
                 variants[variant],
                 className,
@@ -107,7 +107,7 @@ export function GhInput({ className, ...props }: React.InputHTMLAttributes<HTMLI
     return (
         <input
             className={cn(
-                "h-10 w-full rounded-lg border border-border-strong bg-(--background)/60 px-3 text-sm text-foreground placeholder:text-muted-foreground/70",
+                "h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground/70",
                 "focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
                 className,
             )}
