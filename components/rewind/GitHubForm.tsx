@@ -16,7 +16,8 @@ import { toast } from "sonner";
 import { GhButton, GhInput, Chip } from "./primitives";
 import { useRewindStore } from "@/store/rewind-store";
 import { rewindInputSchema } from "@/lib/rewind-schemas";
-import { buildRewind } from "@/lib/github.api";
+import { fetchRewindRaw } from "@/lib/github.api";
+import { computeRewind } from "@/lib/rewind-utils";
 import { analyzeGithubServer } from "@/lib/rewind-actions";
 
 const PRIVATE_CONTRIBUTIONS_DOCS =
@@ -40,11 +41,11 @@ export class RewindError extends Error {
 export const analyzeGithubClient = async (payload: unknown) => {
     const data = rewindInputSchema.parse(payload);
     if (data.token) {
-        return buildRewind(data.username, data.year, data.token);
+        return computeRewind(await fetchRewindRaw(data.username, data.year, data.token));
     }
     const res = await analyzeGithubServer({ username: data.username, year: data.year });
     if (!res.ok) throw new RewindError(res.code, res.message, res.retryAt);
-    return res.data;
+    return computeRewind(res.raw);
 };
 
 const YEARS = Array.from({ length: 6 }, (_, i) => new Date().getUTCFullYear() - i);

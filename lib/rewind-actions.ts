@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 
-import { buildRewind } from "./github.api";
+import { fetchRewindRaw } from "./github.api";
 import { enforceSharedTokenRateLimit, enforceInsightsRateLimit } from "./rate-limit.server";
 import { generateInsights } from "./ai-insights";
 import { insightsInputSchema, rewindInputSchema } from "./rewind-schemas";
@@ -10,7 +10,7 @@ import type { InternalRewindResult } from "./rewind-types";
 
 /**
  * Runs a rewind with OUR token. Capped at 2 requests / 5 min / IP.
- * - Any user-supplied token in the payload is deliberately ignored here: users with their
+ * Any user-supplied token in the payload is deliberately ignored here: users with their
  * own token run the request in the browser and never touch the shared quota.
  */
 export const analyzeGithubServer = async (payload: unknown): Promise<InternalRewindResult> => {
@@ -30,12 +30,13 @@ export const analyzeGithubServer = async (payload: unknown): Promise<InternalRew
     }
 
     try {
-        const result = await buildRewind(
+        // Fetch only. All computation happens on the client (rewind-utils.ts) to save server CPU.
+        const raw = await fetchRewindRaw(
             data.username,
             data.year,
             process.env.INTERNAL_GITHUB_API_TOKEN,
         );
-        return { ok: true, data: result };
+        return { ok: true, raw };
     } catch (e) {
         return {
             ok: false,

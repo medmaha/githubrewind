@@ -1,3 +1,5 @@
+import type { RawRewind } from "./rewind-raw";
+
 export type RewindProfile = {
     login: string;
     name: string | null;
@@ -53,6 +55,17 @@ export type CalendarData = {
     breakdown: { commits: number; prs: number; reviews: number; issues: number; newRepos: number };
     /** Commits per repository, busiest first. Private repos are flagged so the UI can hide links. */
     repoCommits: { fullName: string; url: string; isPrivate: boolean; commits: number }[];
+};
+
+/** One Monday-to-Sunday week. First / last week of the year can be partial (`dayCount < 7`). */
+export type CalendarWeek = {
+    /** First day present in this week (YYYY-MM-DD). */
+    start: string;
+    /** Last day present in this week (YYYY-MM-DD). */
+    end: string;
+    total: number;
+    activeDays: number;
+    dayCount: number;
 };
 
 export type MonthlyPoint = {
@@ -112,9 +125,12 @@ export type InternalLimitResult =
     | { ok: false; reason: "rate_limit"; retryAt: number | null }
     | { ok: false; reason: "forbidden" };
 
-/** Returned (not thrown) by the server action: Next.js redacts thrown error messages in production. */
+/**
+ * Returned (not thrown) by the server action: Next.js redacts thrown error messages in production.
+ * The server only fetches: the client turns `raw` into RewindData with `computeRewind`.
+ */
 export type InternalRewindResult =
-    | { ok: true; data: RewindData }
+    | { ok: true; raw: RawRewind }
     | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
 
 export type Chapter = {
@@ -124,10 +140,12 @@ export type Chapter = {
     headline: string;
     detail?: string;
     stat: { value: string; label: string };
-    /** Inclusive YYYY-MM-DD range the chapter is about (highlighted on the heatmap). */
+    /** Inclusive YYYY-MM-DD range the chapter is about (highlighted on the weekly ribbon). */
     range?: { from: string; to: string };
-    /** 0 = Sunday. Highlights a weekday row instead of a date range. */
+    /** Index of the highlighted weekday, 0 = Monday ... 6 = Sunday. */
     weekday?: number;
+    /** Contributions per weekday, Monday first. Present on the rhythm chapter. */
+    weekdays?: number[];
     /** Receipts: where the reader can verify the claim on GitHub. */
     evidence: { label: string; url: string }[];
 };
