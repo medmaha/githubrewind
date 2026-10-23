@@ -34,10 +34,10 @@ const rateLimiters = {
     }),
 };
 
-export async function enforceRateLimit(key: "insights" | "api") {
+export async function enforceInsightsRateLimit() {
 
     const req = await request();
-    const decision = await rateLimiters[key].protect(req);
+    const decision = await rateLimiters.insights.protect(req);
     if (decision.isDenied()) {
         if (decision.reason.isRateLimit()) {
             const ttl = decision.ttl;
@@ -62,7 +62,7 @@ export async function enforceRateLimit(key: "insights" | "api") {
     }
 }
 
-export async function checkInternalTokenLimit(): Promise<InternalLimitResult> {
+export async function enforceSharedTokenRateLimit(): Promise<InternalLimitResult> {
 
     const req = await request();
     const decision = await rateLimiters.api.protect(req);

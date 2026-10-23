@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { buildRewind } from "./github.api";
-import { checkInternalTokenLimit, enforceRateLimit } from "./rate-limit.server";
+import { enforceSharedTokenRateLimit, enforceInsightsRateLimit } from "./rate-limit.server";
 import { generateInsights } from "./ai-insights";
 import { insightsInputSchema, rewindInputSchema } from "./rewind-schemas";
 import type { InternalRewindResult } from "./rewind-types";
@@ -16,7 +16,7 @@ import type { InternalRewindResult } from "./rewind-types";
 export const analyzeGithubServer = async (payload: unknown): Promise<InternalRewindResult> => {
     const data = rewindInputSchema.parse(payload);
 
-    const limit = await checkInternalTokenLimit();
+    const limit = await enforceSharedTokenRateLimit();
     if (!limit.ok) {
         return {
             ok: false,
@@ -48,6 +48,6 @@ export const analyzeGithubServer = async (payload: unknown): Promise<InternalRew
 
 export const getAiInsights = async (payload: unknown) => {
     const data = insightsInputSchema.parse(payload);
-    await enforceRateLimit("insights");
+    await enforceInsightsRateLimit();
     return generateInsights(data.summary as z.infer<typeof insightsInputSchema>["summary"]);
 };
