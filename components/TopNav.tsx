@@ -7,8 +7,8 @@ import { RotateCcwIcon, SparklesIcon } from "lucide-react";
 
 export default function TopNav() {
     const { data, reset } = useRewindStore();
-    return (<header className="border-b border-border bg-(--elevated)/40 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+    return (<header className="border-b border-border bg-[#010409]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <div className="flex items-center gap-2.5">
                 <GithubIconLink className="w-8 h-8" />
                 <div>

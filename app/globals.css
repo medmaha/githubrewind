@@ -1,9 +1,7 @@
 /* app/globals.css */
 @import "tailwindcss";
 
-/*
- * GitHub-inspired dark design system. All colors are oklch tokens.
-*/
+/* Primer-inspired GitHub dark theme. */
 
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);
@@ -42,49 +40,49 @@
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
-    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 :root {
-    --radius: 0.75rem;
+    --radius: 0.375rem;
 
     /* GitHub dark dimmed / default dark palette */
-    --background: oklch(0.176 0.014 264);
-    --foreground: oklch(0.925 0.008 250);
-    --card: oklch(0.216 0.016 264);
-    --card-foreground: oklch(0.925 0.008 250);
-    --elevated: oklch(0.253 0.018 264);
-    --popover: oklch(0.216 0.016 264);
-    --popover-foreground: oklch(0.925 0.008 250);
+    --background: #0d1117;
+    --foreground: #e6edf3;
+    --card: #0d1117;
+    --card-foreground: #e6edf3;
+    --elevated: #161b22;
+    --popover: #161b22;
+    --popover-foreground: #e6edf3;
 
-    --primary: oklch(0.65 0.17 253);
-    --primary-foreground: oklch(0.985 0.002 250);
-    --secondary: oklch(0.253 0.018 264);
-    --secondary-foreground: oklch(0.9 0.01 250);
+    --primary: #2f81f7;
+    --primary-foreground: #ffffff;
+    --secondary: #21262d;
+    --secondary-foreground: #e6edf3;
 
-    --muted: oklch(0.253 0.018 264);
-    --muted-foreground: oklch(0.68 0.017 258);
-    --accent: oklch(0.62 0.19 149);
-    --accent-foreground: oklch(0.16 0.02 150);
+    --muted: #161b22;
+    --muted-foreground: #8b949e;
+    --accent: #3fb950;
+    --accent-foreground: #ffffff;
 
-    --destructive: oklch(0.64 0.21 22);
-    --destructive-foreground: oklch(0.98 0.003 250);
-    --success: oklch(0.68 0.17 150);
-    --attention: oklch(0.78 0.15 85);
-    --done: oklch(0.66 0.19 300);
-    --sponsor: oklch(0.7 0.18 350);
+    --destructive: #f85149;
+    --destructive-foreground: #ffffff;
+    --success: #3fb950;
+    --attention: #d29922;
+    --done: #a371f7;
+    --sponsor: #db61a2;
 
-    --border: oklch(0.3 0.018 264);
-    --border-strong: oklch(0.38 0.02 264);
-    --input: oklch(0.28 0.018 264);
-    --ring: oklch(0.65 0.17 253);
+    --border: #30363d;
+    --border-strong: #484f58;
+    --input: #0d1117;
+    --ring: #2f81f7;
 
-    --chart-1: oklch(0.65 0.17 253);
-    --chart-2: oklch(0.68 0.17 150);
-    --chart-3: oklch(0.78 0.15 85);
-    --chart-4: oklch(0.66 0.19 300);
-    --chart-5: oklch(0.7 0.18 350);
+    --chart-1: #2f81f7;
+    --chart-2: #3fb950;
+    --chart-3: #d29922;
+    --chart-4: #a371f7;
+    --chart-5: #db6d28;
 }
 
 @layer base {
@@ -99,33 +97,13 @@
     body {
         background-color: var(--color-background);
         color: var(--color-foreground);
-        background-image:
-            radial-gradient(60rem 40rem at 15% -10%, oklch(0.65 0.17 253 / 0.16), transparent 60%),
-            radial-gradient(50rem 36rem at 95% 0%, oklch(0.66 0.19 300 / 0.12), transparent 60%);
-        background-attachment: fixed;
         -webkit-font-smoothing: antialiased;
     }
 }
 
 @utility surface {
-    background: linear-gradient(
-        180deg,
-        color-mix(in oklch, var(--card) 96%, white 4%),
-        var(--card)
-    );
+    background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-2xl);
+    border-radius: var(--radius-md);
 }
 
-@utility glow-ring {
-    box-shadow:
-        0 0 0 1px var(--border),
-        0 18px 40px -24px oklch(0 0 0 / 0.9);
-}
-
-@utility text-gradient {
-    background: linear-gradient(92deg, var(--chart-1), var(--chart-4) 55%, var(--chart-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}

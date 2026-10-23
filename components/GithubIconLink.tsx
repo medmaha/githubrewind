@@ -16,7 +16,7 @@ export default function GithubIconLink({ className, iconClassName, children }: P
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-                "hover:text-foreground text-foreground/90 transition-colors h-6 bg-white rounded-full inline-flex justify-center gap-2 items-center",
+                "inline-flex h-6 items-center justify-center gap-2 text-foreground/90 transition-colors hover:text-foreground",
                 className,
             )}
         >
