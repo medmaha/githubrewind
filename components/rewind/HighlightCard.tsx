@@ -77,7 +77,7 @@ export function HighlightCard({
     insights,
 }: {
     data: RewindData;
-    insights: AiInsights | null;
+    insights: AiInsights;
 }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [rendering, setRendering] = useState(true);
@@ -173,20 +173,14 @@ export function HighlightCard({
         y += 108;
         ctx.fillStyle = PALETTE.text;
         ctx.font = "600 30px ui-sans-serif, -apple-system, Segoe UI, Roboto, sans-serif";
-        const headline =
-            insights?.headline ??
-            `${nf(data.totals.commitsThisYear)} commits and a whole lot of shipping`;
-        for (const line of wrap(ctx, headline, W - padX * 2, 2)) {
+        for (const line of wrap(ctx, insights.headline, W - padX * 2, 2)) {
             ctx.fillText(line, padX, y);
             y += 40;
         }
 
-        if (insights?.personaTitle) {
-            ctx.fillStyle = "#2f81f7";
-            ctx.font = "600 20px ui-monospace, SFMono-Regular, Menlo, monospace";
-            ctx.fillText(insights.personaTitle, padX, y + 4);
-            y += 20;
-        }
+        ctx.fillStyle = "#2f81f7";
+        ctx.font = "600 20px ui-monospace, SFMono-Regular, Menlo, monospace";
+        ctx.fillText(insights.personaTitle, padX, y + 4);
 
         // Stat tiles
         const stats: [string, string][] = [
@@ -320,11 +314,7 @@ export function HighlightCard({
             <div className="mt-3 flex flex-wrap gap-2">
                 <Chip tone="primary">1200 × 630</Chip>
                 <Chip>PNG export</Chip>
-                {insights ? (
-                    <Chip tone="success">AI headline</Chip>
-                ) : (
-                    <Chip>generate AI for headline</Chip>
-                )}
+                <Chip tone="success">AI-generated headline</Chip>
             </div>
         </Panel>
     );

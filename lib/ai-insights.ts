@@ -45,20 +45,35 @@ export async function generateInsights(summary: InsightsSummary): Promise<AiInsi
                 ? value.filter((v): v is string => typeof v === "string").slice(0, 5)
                 : fallback;
 
+        if (
+            typeof parsed.personaTitle !== "string" ||
+            !parsed.personaTitle.trim() ||
+            typeof parsed.headline !== "string" ||
+            !parsed.headline.trim()
+        ) {
+            throw new Error("AI returned incomplete insights. Please try again.");
+        }
+
         return {
-            personaTitle: parsed.personaTitle?.slice(0, 60) ?? "The Builder",
-            headline: parsed.headline?.slice(0, 140) ?? `A year of shipping on GitHub`,
+            personaTitle: parsed.personaTitle.slice(0, 60),
+            headline: parsed.headline.slice(0, 140),
             yearlyOverview: parsed.yearlyOverview ?? "",
             significantAchievements: list(parsed.significantAchievements, []),
             areasOfGrowth: list(parsed.areasOfGrowth, []),
             codingStyle: parsed.codingStyle ?? "",
             shareCaption: (parsed.shareCaption ?? "").slice(0, 400),
         };
-    } catch (response: any) {
-        console.error(`AI gateway failed [${response.status}]: ${summary}`);
-        if (response.status === 429)
+    } catch (response: unknown) {
+        const status =
+            response && typeof response === "object" && "status" in response
+                ? response.status
+                : undefined;
+        if (response instanceof Error && status === undefined) throw response;
+
+        console.error(`AI gateway failed [${status ?? "unknown"}]`);
+        if (status === 429)
             throw new Error("AI is busy right now. Please retry in a moment.");
-        if (response.status === 402) throw new Error("AI credits exhausted for this workspace.");
-        throw new Error(`AI request failed (${response.status}).`);
+        if (status === 402) throw new Error("AI credits exhausted for this workspace.");
+        throw new Error(`AI request failed (${status ?? "unknown"}).`);
     }
 }

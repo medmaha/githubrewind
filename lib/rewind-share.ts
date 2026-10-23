@@ -36,30 +36,32 @@ const nf = (n: number) => n.toLocaleString("en-US");
 
 export function buildShareText(
     data: RewindData,
-    insights: AiInsights | null,
+    insights: AiInsights,
     platform: Platform,
 ): string {
     const t = data.totals;
     const name = data.profile.name ?? data.profile.login;
     const langs = data.languages.slice(0, 3).map((l) => l.name);
-    const tags = [
-        "GitHubRewind",
-        "BuildInPublic",
-        ...langs.map((l) => l.replace(/[^A-Za-z0-9]/g, "")),
-    ]
-        .slice(0, 5)
-        .map((t2) => `#${t2}`)
-        .join(" ");
 
     if (platform === "twitter") {
-        const short = `My ${data.year} GitHub Rewind 🚀\n${nf(t.commitsThisYear)} commits · ${nf(t.prsMerged)} PRs merged · ${nf(t.repos)} repos · ${nf(t.stars)} stars\nTop: ${langs.join(", ") || "code"}\n#GitHubRewind`;
-        return clamp(short, PLATFORMS.twitter.limit);
+        const details = [
+            `${data.year} · ${nf(t.commitsThisYear)} commits · ${nf(t.prsMerged)} PRs merged · ${nf(t.repos)} repos · ${nf(t.stars)} stars`,
+            langs.length ? `Top languages: ${langs.join(", ")}` : "",
+        ]
+            .filter(Boolean)
+            .join("\n");
+        const captionLength = Math.max(
+            0,
+            PLATFORMS.twitter.limit - details.length - (insights.shareCaption ? 1 : 0),
+        );
+        const caption = clamp(insights.shareCaption, captionLength);
+        return [details, caption].filter(Boolean).join("\n");
     }
 
     const body = [
-        `${name}'s ${data.year} GitHub Rewind ${insights?.personaTitle ? `- ${insights.personaTitle}` : ""}`.trim(),
+        `${name}'s ${data.year} GitHub Rewind - ${insights.personaTitle}`,
         "",
-        insights?.yearlyOverview ?? insights?.headline ?? "",
+        insights.yearlyOverview,
         "",
         "📊 By the numbers",
         `• ${nf(t.commitsThisYear)} commits`,
@@ -67,20 +69,16 @@ export function buildShareText(
         `• ${nf(t.issues)} issues · ${nf(t.reviews)} reviews`,
         `• ${nf(t.repos)} repositories · ${nf(t.stars)} stars earned`,
         `• ~${nf(t.estimatedLinesOfCode)} lines of code (estimated)`,
-        `• Top languages: ${langs.join(", ") || "-"}`,
+        ...(langs.length ? [`• Top languages: ${langs.join(", ")}`] : []),
         "",
-        insights?.significantAchievements?.length
-            ? `🏆 Highlights\n${insights.significantAchievements
-                .slice(0, 3)
-                .map((a) => `• ${a}`)
-                .join("\n")}`
+        insights.significantAchievements.length
+            ? `🏆 Highlights\n${insights.significantAchievements.slice(0, 3).map((a) => `• ${a}`).join("\n")}`
             : "",
         "",
-        insights?.shareCaption ?? "",
+        insights.shareCaption,
         "",
-        tags,
     ]
-        .filter((line) => line !== undefined)
+        .filter(Boolean)
         .join("\n")
         .replace(/\n{3,}/g, "\n\n")
         .trim();

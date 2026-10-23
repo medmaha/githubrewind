@@ -21,8 +21,12 @@ export default function PageData() {
                 <LanguagesWidget data={data} />
                 <AchievementsWidget data={data} />
             </div>
-            <HighlightCard data={data} insights={insights} />
-            <SharePanel data={data} insights={insights} />
+            {insights ? (
+                <>
+                    <HighlightCard data={data} insights={insights} />
+                    <SharePanel data={data} insights={insights} />
+                </>
+            ) : null}
             {data.notes.length ? (
                 <Panel>
                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

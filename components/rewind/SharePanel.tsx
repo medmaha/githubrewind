@@ -7,7 +7,7 @@ import { PLATFORMS, buildShareText, shareUrl, type Platform } from "@/lib/rewind
 import type { AiInsights, RewindData } from "@/lib/rewind-types";
 import { cn } from "@/lib/utils";
 
-export function SharePanel({ data, insights }: { data: RewindData; insights: AiInsights | null }) {
+export function SharePanel({ data, insights }: { data: RewindData; insights: AiInsights }) {
     const [platform, setPlatform] = useState<Platform>("linkedin");
     const [copied, setCopied] = useState(false);
 
