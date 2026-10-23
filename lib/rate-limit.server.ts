@@ -43,7 +43,9 @@ const rateLimiters = {
     }),
 };
 
-export async function enforceRateLimit(key: "insights" | "api" | "feedback") {
+export async function enforceRateLimit(key: "insights" | "api") {
+    if (process.env.CF_WORKER_DEV === "true") return
+
     const req = await request();
     const decision = await rateLimiters[key].protect(req);
     if (decision.isDenied()) {
