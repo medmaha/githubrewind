@@ -3,6 +3,7 @@ import { useRewindStore } from "@/store/rewind-store";
 import { AchievementsWidget, ActivityWidget, LanguagesWidget, ProfileWidget, ReposWidget, StatsGrid } from "./rewind/StatsWidgets";
 import { InsightsPanel } from "./rewind/InsightsWidgets";
 import { HighlightCard } from "./rewind/HighlightCard";
+import { StoryView } from "./rewind/Storyview";
 import { SharePanel } from "./rewind/SharePanel";
 import { Panel } from "./rewind/primitives";
 
@@ -13,20 +14,21 @@ export default function PageData() {
     return (
         <div className="space-y-4">
             <ProfileWidget data={data} />
+            <StoryView data={data} />
             <StatsGrid data={data} />
             <InsightsPanel data={data} />
             <div className="grid gap-4 lg:grid-cols-2">
-                <ReposWidget data={data} />
-                <ActivityWidget data={data} />
                 <LanguagesWidget data={data} />
+                <ActivityWidget data={data} />
+                <ReposWidget data={data} />
                 <AchievementsWidget data={data} />
             </div>
-            {insights ? (
+            {insights &&
                 <>
                     <HighlightCard data={data} insights={insights} />
                     <SharePanel data={data} insights={insights} />
                 </>
-            ) : null}
+            }
             {data.notes.length ? (
                 <Panel>
                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">

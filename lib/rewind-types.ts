@@ -116,3 +116,18 @@ export type InternalLimitResult =
 export type InternalRewindResult =
     | { ok: true; data: RewindData }
     | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
+
+export type Chapter = {
+    id: "opening" | "rhythm" | "busiest" | "quiet" | "comeback" | "project" | "ending";
+    title: string;
+    /** One factual sentence. Everything here is computed from the calendar, never AI-written. */
+    headline: string;
+    detail?: string;
+    stat: { value: string; label: string };
+    /** Inclusive YYYY-MM-DD range the chapter is about (highlighted on the heatmap). */
+    range?: { from: string; to: string };
+    /** 0 = Sunday. Highlights a weekday row instead of a date range. */
+    weekday?: number;
+    /** Receipts: where the reader can verify the claim on GitHub. */
+    evidence: { label: string; url: string }[];
+};
