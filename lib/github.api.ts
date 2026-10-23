@@ -1,5 +1,3 @@
-// "use server"
-
 import type {
     Achievement,
     LanguageStat,
