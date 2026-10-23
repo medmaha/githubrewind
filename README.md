@@ -1,46 +1,35 @@
-# GitHub Activity Rewind
+# GithubRewind
 
-GithubRewind turns a year of GitHub activity into a visual review of commits, pull requests, issues, reviews, repositories, languages, achievements, and activity patterns. It can also generate an AI-written year-in-review and a shareable highlight card.
+I built GithubRewind for fun: a small open source project for looking back at a year of GitHub activity. Give it a username and a year, and it turns the data GitHub makes available into stats, little activity stories, and an optional AI-written recap.
 
-## Features
+It is a personal project, not an official GitHub product. It is released under the [MIT License](LICENCE).
 
-- Analyze a GitHub username for a selected year
-- Browse fetched metrics, data-based Stories, and AI Insights on separate pages
-- Use public GitHub data without signing in
-- Optionally provide a read-only fine-grained GitHub token to include private repositories
-- Generate factual AI insights with Google Gemini
-- Create and share a developer highlight card
-- Collect product feedback when PostgreSQL is configured
-- Rate-limited and bot-protected with Arcjet
+## What it does
 
-## Screenshots
-<img width="1209" height="583" alt="Screenshot 2026-09-07 121223" src="https://github.com/user-attachments/assets/475d2451-2c02-4142-92f3-b75344ee1160" />
+- Summarizes a profile, repositories, commits, pull requests, issues, reviews, stars, languages, and activity streaks.
+- Builds a contribution calendar and factual story chapters when a calendar is available.
+- Generates an optional AI year-in-review, a PNG highlight card, and share captions.
+- Saves your latest rewind in your browser so you can return to it after a reload.
+- Includes a page where you can inspect and clear the data GithubRewind has saved in that browser.
+- Uses a dark interface inspired by GitHub.
 
-## Stack
+## Take a look around
 
-- Next.js and React
-- TypeScript
-- Tailwind CSS
-- Zustand
-- Google Gemini
-- GitHub REST API
-- Drizzle ORM with Neon PostgreSQL + (For Feedbacks)
-- Arcjet
+After you run a rewind, the navigation links take you to:
 
-## Getting Started
+| Page | What you will find |
+| --- | --- |
+| `/rewind` | Profile, activity totals, repositories, languages, and achievements |
+| `/stories` | Chapters computed from the contribution calendar, with links back to GitHub |
+| `/insights` | Optional AI recap, downloadable highlight card, and share captions |
+| `/_data` | A view of the saved browser record and a control to clear it |
 
-### Prerequisites
+## Run it locally
 
-- Node.js 20 or newer
-- pnpm
-- An Arcjet project and API key
-- A Google Gemini API key
-- PostgreSQL only if you want to store feedback
-
-### Installation
+You will need Node.js and pnpm. Clone the repository and install its dependencies:
 
 ```bash
-git clone https://github.com/mahammed-toures/githubrewind.git
+git clone https://github.com/medmaha/githubrewind.git
 cd githubrewind
 pnpm install
 ```
@@ -48,10 +37,14 @@ pnpm install
 Create `.env.local` in the project root:
 
 ```dotenv
+# Required by the server-side Arcjet rate limiters
 ARCJET_KEY="your-arcjet-key"
+
+# Optional: enables AI year-in-review generation
 GEMINI_API_KEY="your-gemini-api-key"
-# Optional: enables feedback persistence
-DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
+
+# Optional: lets the app make limited shared-token GitHub requests
+INTERNAL_GITHUB_API_TOKEN="your-read-only-github-token"
 ```
 
 Start the development server:
@@ -60,65 +53,47 @@ Start the development server:
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Then open [http://localhost:3000](http://localhost:3000).
 
-## Environment Variables
+You can use your own fine-grained GitHub token in the form instead of configuring a shared token. It is useful for the full-year contribution calendar, higher GitHub API limits, and access to private repositories that belong to your account. Use a read-only token with the minimum access GitHub allows for the data you want to view.
 
-| Variable         | Required | Purpose                                                          |
-| ---------------- | -------- | ---------------------------------------------------------------- |
-| `ARCJET_KEY`     | Yes      | Enables Arcjet rate limiting and bot protection.                 |
-| `GEMINI_API_KEY` | Yes      | Enables AI-generated year-in-review insights.                    |
-| `DATABASE_URL`   | No       | PostgreSQL connection string used to store feedback submissions. |
+## A note about the numbers
 
-The GitHub token is not a server environment variable. Users can optionally enter a read-only fine-grained token in the app when they want private repository data included. It is used for the request only and kept in memory.
+GitHub does not expose every kind of activity through one API. What GithubRewind can show depends on the selected year, the available GitHub endpoints, the token used, and GitHub contribution visibility settings.
 
-Never commit `.env.local` or share API keys, database credentials, GitHub tokens, or deployment tokens. If a credential is exposed, revoke or rotate it immediately.
+- The full-year contribution calendar needs an authenticated GitHub request. Without it, the app falls back to the public events feed, which only covers roughly the last 90 days.
+- Private contributions appear only when GitHub makes them visible in the profile contribution calendar. Private repository details are only fetched when the token belongs to the account being analyzed.
+- Some totals use GitHub search results or public events and may not line up perfectly with the contribution calendar.
+- Lines of code is a rough estimate based on repository size, not a count of lines changed during the selected year.
+- Story chapters are calculated from calendar data. They describe patterns in the numbers; they do not explain why those patterns happened.
+- AI insights are generated text and can be inaccurate. Give the recap a read before sharing it.
 
-After generating a rewind, use the in-app navigation to switch between `/rewind` (fetched
-metrics), `/stories` (calendar-based chapters), and `/insights` (AI narrative and share cards).
-The footer's `/_data` page shows the complete record stored locally and lets users clear it.
-Rewind data, generated insights, and the username/year are persisted in this browser with
-Zustand persist, so they are available after a reload. Saved results are kept in this browser's
-local storage; the GitHub token is never persisted. Use **New rewind** to clear the saved rewind
-and insights.
+## Data and tokens
 
-## Feedback Database
+Rewind results and generated insights are stored in this browser's local storage. The saved-data page shows the record and can clear it. The GitHub token entered into the form stays in memory for the current browser session and is not persisted.
 
-Feedback persistence is optional. When `DATABASE_URL` is not configured, the main GithubRewind experience and AI insights can still be used, but feedback submissions cannot be stored.
+When you provide your own token, GitHub requests are made from your browser. Without one, rewind requests use the server action and the optional `INTERNAL_GITHUB_API_TOKEN`. The shared-token endpoint is limited to two requests per IP every five minutes by Arcjet. AI generation is also rate limited.
 
-The app expects a PostgreSQL table named `feedbacks` with this shape:
+For AI insights, the app sends a compact summary of the rewind to Gemini from the server. The summary includes the username, counts, language percentages, top repository names, and topics; it does not include the GitHub token or raw event payloads.
 
-```sql
-CREATE TABLE feedbacks (
-  id serial PRIMARY KEY NOT NULL,
-  author varchar(100) NOT NULL,
-  subject varchar(100) NOT NULL,
-  content varchar(500) NOT NULL,
-  device_hash varchar(500),
-  rating integer DEFAULT 3,
-  created_at timestamp DEFAULT now() NOT NULL
-);
-```
+## Built with
 
-The schema is defined in [`lib/db/schema.ts`](lib/db/schema.ts). Apply the equivalent SQL to your database before enabling feedback persistence.
+Next.js, React, TypeScript, Tailwind CSS, Zustand, GitHub REST and GraphQL APIs, Google's Generative AI SDK, and Arcjet.
 
-## Production Build
+## Scripts
 
-```bash
-pnpm build
-pnpm start
-```
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Run the local development server |
+| `pnpm build` | Create a production build |
+| `pnpm start` | Serve a production build |
+| `pnpm format` | Format the project with Prettier |
+| `pnpm format:check` | Check formatting with Prettier |
 
-For Vercel or another hosting provider, configure the same environment variables in the project settings. Keep `DATABASE_URL` unset if feedback storage is not needed.
+## A note from me
 
-## Contributing
+This started as me having fun and building a little project. It grew as I kept adding things I wanted to see in my own year in code. If you find a bug, have an idea, or want to make it your own, issues and pull requests are welcome.
 
-Contributions are welcome. Please open an issue to discuss a substantial change before submitting a pull request. Keep changes focused, use TypeScript conventions already present in the project, and verify the production build with `pnpm build`.
+## Made By [Mahammed Touray](https://github.com/medmaha) - With 💖
 
-## License
-
-This project is open source under the [MIT License](LICENCE).
-
-## Made With 💖
-
-By [Mahammed Touray](github.com/medmaha)
+Have fun with it.
