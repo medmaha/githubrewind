@@ -90,14 +90,14 @@ export function InsightsPanel({ data }: { data: RewindData }) {
                     <Chip tone="primary">
                         <Sparkles className="size-3" /> {insights.personaTitle}
                     </Chip>
-                    <GhButton variant="ghost" size="sm" onClick={generate} disabled={loading}>
+                    {/* <GhButton variant="ghost" size="sm" onClick={generate} disabled={loading}>
                         {loading ? (
                             <Loader2 className="size-3.5 animate-spin" />
                         ) : (
                             <Wand2 className="size-3.5" />
                         )}
                         Regenerate
-                    </GhButton>
+                    </GhButton> */}
                 </div>
                 <h2 className="mt-3 text-balance text-xl font-semibold tracking-tight sm:text-2xl">
                     {insights.headline}

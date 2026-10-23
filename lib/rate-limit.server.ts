@@ -27,7 +27,7 @@ const rateLimiters = {
             shield({ mode }),
             fixedWindow({
                 mode,
-                window: "60s", // 1 minutes fixed window
+                window: "600s", // 5 minutes fixed window
                 max: 2, // allow a maximum of 3 requests
             }),
         ],
