@@ -18,7 +18,7 @@ Return STRICT JSON only, matching:
   "shareCaption": string (max 260 chars, LinkedIn-ready, first person, 1-2 emojis max)
 }`;
 
-const apiKey = process.env["GEMINI_API_KEY"];
+const apiKey = process.env.GEMINI_API_KEY
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
 export async function generateInsights(summary: InsightsSummary): Promise<AiInsights> {
