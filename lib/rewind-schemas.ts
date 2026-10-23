@@ -9,7 +9,7 @@ export const rewindInputSchema = z.object({
         .min(1, "Enter a GitHub username")
         .max(39)
         .regex(/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/, "Invalid GitHub username"),
-    year: z.number().int().min(2008).max(currentYear),
+    year: z.coerce.number().int().min(2008).max(currentYear),
     token: z
         .string()
         .trim()

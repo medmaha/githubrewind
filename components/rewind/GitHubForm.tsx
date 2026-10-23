@@ -5,18 +5,32 @@ import { GitBranch, KeyRound, Loader2, Search, ShieldCheck } from "lucide-react"
 import { toast } from "sonner";
 
 import { GhButton, GhInput, Chip } from "./primitives";
-import { analyzeGithub } from "@/lib/rewind-actions";
 import { useRewindStore } from "@/store/rewind-store";
+import { rewindInputSchema } from "@/lib/rewind-schemas";
+import { buildRewind } from "@/lib/github.api";
+import { analyzeGithubServer } from "@/lib/rewind-actions";
+
+export const analyzeGithubClient = async (payload: unknown, useInternalToken = false) => {
+    const data = rewindInputSchema.parse(payload);
+    if (useInternalToken) {
+        return analyzeGithubServer({ username: data.username, year: data.year })
+    }
+    return buildRewind(data.username, data.year, data.token || undefined);
+};
 
 const YEARS = Array.from({ length: 6 }, (_, i) => new Date().getUTCFullYear() - i);
 
 export default function GitHubForm() {
     const [showToken, setShowToken] = useState(false);
+    const [showTokenInternalTokenPrompt, setShowTokenInternalTokenPrompt] = useState(false);
+    const [useInternalToken, setUseInternalTokens] = useState(false);
+
     const {
         username,
         year,
         token,
         status,
+        error,
         setUsername,
         setYear,
         setToken,
@@ -35,17 +49,25 @@ export default function GitHubForm() {
         }
         startLoading();
         try {
-            const data = await analyzeGithub({
+            const data = await analyzeGithubClient({
                 username: username.trim(),
                 year,
                 token: token.trim(),
-            });
+            }, useInternalToken);
             setData(data);
             toast.success(`Rewind ready for @${data.profile.login}`);
         } catch (error) {
             const message = (error as Error).message || "Something went wrong";
+            if (message.includes("GitHub rate limit reached")) {
+                setShowTokenInternalTokenPrompt(true)
+            }
             setError(message);
-            toast.error(message);
+            toast.error(message, { className: "bg-red-500 text-white" });
+        } finally {
+            if (showTokenInternalTokenPrompt) {
+                setUseInternalTokens(false)
+                setShowTokenInternalTokenPrompt(false)
+            }
         }
     }
 
@@ -119,6 +141,33 @@ export default function GitHubForm() {
                         Used only for this request, kept in memory, never written to storage or a
                         database. Use a read-only, fine-grained token and revoke it any time.
                     </p>
+                </div>
+            ) : null}
+            {showTokenInternalTokenPrompt && error ? (
+                <div className="mt-3">
+                    <GhButton
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            if (!useInternalToken) {
+                                setUseInternalTokens(true)
+                                return
+                            }
+                            setUseInternalTokens(false)
+                            setShowTokenInternalTokenPrompt(false)
+                        }}
+                        className="px-2"
+                    >
+                        <KeyRound className="size-3.5" />
+                        {!useInternalToken ? "Use our internal token (1 more req)" : "Remove internal token"}
+                    </GhButton>
+                    {useInternalToken &&
+                        <p className="mt-2 flex items-start gap-1.5 text-xs text-primary">
+                            <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-success" />
+                            Using our internal fine-grained GitHub token for your next request.
+                        </p>
+                    }
                 </div>
             ) : null}
         </form>

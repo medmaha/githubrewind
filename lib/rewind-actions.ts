@@ -2,15 +2,15 @@
 
 import { z } from "zod";
 
-import { buildRewind } from "./github.server";
+import { buildRewind } from "./github.api";
 import { enforceRateLimit } from "./rate-limit.server";
 import { generateInsights } from "./ai-insights";
-import { rewindInputSchema, insightsInputSchema } from "./rewind-schemas";
+import { insightsInputSchema, rewindInputSchema } from "./rewind-schemas";
 
-export const analyzeGithub = async (payload: unknown) => {
+export const analyzeGithubServer = async (payload: unknown) => {
     const data = rewindInputSchema.parse(payload);
     await enforceRateLimit("api");
-    return buildRewind(data.username, data.year, data.token || undefined);
+    return buildRewind(data.username, data.year, process.env.INTERNAL_GITHUB_API_TOKEN);
 };
 
 export const getAiInsights = async (payload: unknown) => {
