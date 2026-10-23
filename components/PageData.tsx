@@ -16,9 +16,9 @@ export default function PageData() {
             <StatsGrid data={data} />
             <InsightsPanel data={data} />
             <div className="grid gap-4 lg:grid-cols-2">
-                <LanguagesWidget data={data} />
-                <ActivityWidget data={data} />
                 <ReposWidget data={data} />
+                <ActivityWidget data={data} />
+                <LanguagesWidget data={data} />
                 <AchievementsWidget data={data} />
             </div>
             <HighlightCard data={data} insights={insights} />

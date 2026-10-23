@@ -42,7 +42,27 @@ export type Achievement = {
     tier: "bronze" | "silver" | "gold";
 };
 
-export type MonthlyPoint = { month: string; commits: number; repos: number };
+export type CalendarDay = { date: string; count: number };
+
+export type CalendarData = {
+    /** Every day of the year, sorted ascending. Counts include commits, PRs, issues and reviews. */
+    days: CalendarDay[];
+    totalContributions: number;
+    /** Private contributions the user chose to show on their profile (included in the counts). */
+    restrictedContributions: number;
+    breakdown: { commits: number; prs: number; reviews: number; issues: number; newRepos: number };
+    /** Commits per repository, busiest first. Private repos are flagged so the UI can hide links. */
+    repoCommits: { fullName: string; url: string; isPrivate: boolean; commits: number }[];
+};
+
+export type MonthlyPoint = {
+    month: string;
+    /** Push-event commits (public event feed, ~90 days only). Legacy. */
+    commits: number;
+    repos: number;
+    /** Full-year contributions when a calendar is available, otherwise equals `commits`. */
+    contributions: number;
+};
 
 export type RewindData = {
     year: number;
@@ -70,6 +90,8 @@ export type RewindData = {
     topRepos: RepoSummary[];
     recentRepos: RepoSummary[];
     monthly: MonthlyPoint[];
+    /** Full-year GraphQL contribution calendar. null when no token / request failed. */
+    calendar: CalendarData | null;
     achievements: Achievement[];
     notes: string[];
     events: any;
@@ -84,3 +106,13 @@ export type AiInsights = {
     personaTitle: string;
     shareCaption: string;
 };
+
+export type InternalLimitResult =
+    | { ok: true }
+    | { ok: false; reason: "rate_limit"; retryAt: number | null }
+    | { ok: false; reason: "forbidden" };
+
+/** Returned (not thrown) by the server action: Next.js redacts thrown error messages in production. */
+export type InternalRewindResult =
+    | { ok: true; data: RewindData }
+    | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };

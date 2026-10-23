@@ -125,7 +125,7 @@ export function ProfileWidget({ data }: { data: RewindData }) {
             <img
                 src={data.profile.avatarUrl}
                 alt={`${data.profile.login} avatar`}
-                className="size-16 rounded-full border border-border sm:size-20"
+                className="size-16 rounded-2xl border border-border-strong sm:size-20"
                 loading="lazy"
             />
             <div className="min-w-0 flex-1">
@@ -158,7 +158,7 @@ export function ProfileWidget({ data }: { data: RewindData }) {
                 </div>
             </div>
             <div className="shrink-0 text-right">
-                <div className="font-mono text-4xl font-semibold text-primary sm:text-5xl">
+                <div className="font-mono text-4xl font-bold text-gradient sm:text-5xl">
                     {data.year}
                 </div>
                 <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -226,13 +226,17 @@ export function LanguagesWidget({ data }: { data: RewindData }) {
 }
 
 export function ActivityWidget({ data }: { data: RewindData }) {
-    const max = Math.max(1, ...data.monthly.map((m) => m.commits));
+    const max = Math.max(1, ...data.monthly.map((m) => m.contributions));
     return (
         <Panel>
             <PanelHeader
                 icon={<Activity className="size-4" />}
                 title="Activity cadence"
-                hint="Push activity from the public event stream (last ~90 days of events)"
+                hint={
+                    data.calendar
+                        ? `Contributions per month across ${data.year} (commits, PRs, reviews, issues)`
+                        : "Push activity from the public event feed, which only covers ~90 days. Add a token for the full year."
+                }
             />
             <div className="flex h-40 items-end gap-1.5">
                 {data.monthly.map((m) => (
@@ -243,10 +247,10 @@ export function ActivityWidget({ data }: { data: RewindData }) {
                         <div className="relative flex w-full flex-1 items-end">
                             <div
                                 className="w-full rounded-t-md bg-[linear-gradient(180deg,var(--chart-2),color-mix(in_oklch,var(--chart-1)_70%,transparent))] transition-all group-hover:brightness-125"
-                                style={{ height: `${Math.max(3, (m.commits / max) * 100)}%` }}
+                                style={{ height: `${Math.max(3, (m.contributions / max) * 100)}%` }}
                             />
                             <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 font-mono text-[10px] text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
-                                {m.commits}
+                                {m.contributions}
                             </span>
                         </div>
                         <span className="font-mono text-[10px] text-muted-foreground">
@@ -263,7 +267,7 @@ export function ReposWidget({ data }: { data: RewindData }) {
     return (
         <Panel>
             <PanelHeader
-                icon={<Star className="size-4" />}
+                icon={<Star className="size-4 text-orange-500" />}
                 title="Top repositories"
                 hint="Ranked by stars"
             />
@@ -274,7 +278,7 @@ export function ReposWidget({ data }: { data: RewindData }) {
                             href={repo.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-start justify-between gap-3 rounded-md border border-border bg-background px-3 py-2.5 transition-colors hover:border-border-strong"
+                            className="flex items-start justify-between gap-3 rounded-xl border border-transparent bg-(--elevated)/60 px-3 py-2.5 transition-colors hover:border-border-strong"
                         >
                             <span className="min-w-0">
                                 <span className="block truncate text-sm font-medium text-primary">
@@ -314,7 +318,7 @@ export function AchievementsWidget({ data }: { data: RewindData }) {
                 {data.achievements.map((a) => (
                     <div
                         key={a.id}
-                        className="rounded-md border border-border bg-background p-3"
+                        className="rounded-xl border border-border bg-(--elevated)/60 p-3"
                     >
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium">{a.title}</span>

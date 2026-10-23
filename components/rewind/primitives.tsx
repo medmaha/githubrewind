@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export function Panel({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
     return (
@@ -91,11 +93,11 @@ export function GhButton({
         ghost: "text-muted-foreground hover:bg-[var(--elevated)] hover:text-foreground",
     } as const;
     return (
-        <button
+        <Button
+            variant={variant === "primary" ? "default" : variant}
             className={cn(
-                "inline-flex items-center justify-center gap-2 rounded-md border border-transparent text-sm transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-transparent text-sm transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 size === "sm" ? "h-8 px-3" : "h-10 px-4",
-                variants[variant],
                 className,
             )}
             {...props}
@@ -105,7 +107,7 @@ export function GhButton({
 
 export function GhInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
     return (
-        <input
+        <Input
             className={cn(
                 "h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground/70",
                 "focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",

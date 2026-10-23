@@ -1,7 +1,15 @@
-"use client"
+"use client";
 
 import { useState } from "react";
-import { GitBranch, KeyRound, Loader2, Search, ShieldCheck } from "lucide-react";
+import {
+    ExternalLink,
+    GitBranch,
+    Info,
+    KeyRound,
+    Loader2,
+    Search,
+    ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { GhButton, GhInput, Chip } from "./primitives";
@@ -10,27 +18,52 @@ import { rewindInputSchema } from "@/lib/rewind-schemas";
 import { buildRewind } from "@/lib/github.api";
 import { analyzeGithubServer } from "@/lib/rewind-actions";
 
+const PRIVATE_CONTRIBUTIONS_DOCS =
+    "https://docs.github.com/account-and-profile/setting-up-and-managing-your-github-profile/managing-contribution-settings-on-your-profile/viewing-contributions-on-your-profile";
+const NEW_FINE_GRAINED_TOKEN = "https://github.com/settings/personal-access-tokens/new";
+
+export class RewindError extends Error {
+    code: "INTERNAL_LIMIT" | "ERROR";
+    retryAt: number | null;
+    constructor(code: "INTERNAL_LIMIT" | "ERROR", message: string, retryAt: number | null = null) {
+        super(message);
+        this.code = code;
+        this.retryAt = retryAt;
+    }
+}
+
 export const analyzeGithubClient = async (payload: unknown, useInternalToken = false) => {
     const data = rewindInputSchema.parse(payload);
     if (useInternalToken) {
-        return analyzeGithubServer({ username: data.username, year: data.year })
+        const res = await analyzeGithubServer({ username: data.username, year: data.year });
+        if (!res.ok) throw new RewindError(res.code, res.message, res.retryAt);
+        return res.data;
     }
     return buildRewind(data.username, data.year, data.token || undefined);
 };
 
 const YEARS = Array.from({ length: 6 }, (_, i) => new Date().getUTCFullYear() - i);
 
+function minutesUntil(ts: number | null) {
+    if (!ts) return null;
+    return Math.max(1, Math.ceil((ts - Date.now()) / 60_000));
+}
+
 export default function GitHubForm() {
     const [showToken, setShowToken] = useState(false);
-    const [showTokenInternalTokenPrompt, setShowTokenInternalTokenPrompt] = useState(false);
-    const [useInternalToken, setUseInternalTokens] = useState(false);
+    // GitHub rate-limited the user's anonymous browser requests -> offer the shared token.
+    const [offerInternal, setOfferInternal] = useState(false);
+    const [useInternal, setUseInternal] = useState(false);
+    // The shared token's 2-per-5-min quota is spent -> user must bring their own token.
+    const [internalExhausted, setInternalExhausted] = useState<{ retryAt: number | null } | null>(
+        null,
+    );
 
     const {
         username,
         year,
         token,
         status,
-        error,
         setUsername,
         setYear,
         setToken,
@@ -40,6 +73,10 @@ export default function GitHubForm() {
     } = useRewindStore();
 
     const loading = status === "loading";
+    const hasOwnToken = token.trim().length > 0;
+    // A user's own token always wins and never touches the shared quota.
+    const sharedActive = useInternal && !hasOwnToken;
+    const retryMinutes = minutesUntil(internalExhausted?.retryAt ?? null);
 
     async function onSubmit(event: React.FormEvent) {
         event.preventDefault();
@@ -49,25 +86,26 @@ export default function GitHubForm() {
         }
         startLoading();
         try {
-            const data = await analyzeGithubClient({
-                username: username.trim(),
-                year,
-                token: token.trim(),
-            }, useInternalToken);
+            const data = await analyzeGithubClient(
+                { username: username.trim(), year, token: token.trim() },
+                sharedActive,
+            );
             setData(data);
+            setInternalExhausted(null);
             toast.success(`Rewind ready for @${data.profile.login}`);
-        } catch (error) {
-            const message = (error as Error).message || "Something went wrong";
-            if (message.includes("GitHub rate limit reached")) {
-                setShowTokenInternalTokenPrompt(true)
+        } catch (err) {
+            const message = (err as Error).message || "Something went wrong";
+
+            if (err instanceof RewindError && err.code === "INTERNAL_LIMIT") {
+                setUseInternal(false);
+                setOfferInternal(false);
+                setInternalExhausted({ retryAt: err.retryAt });
+                setShowToken(true);
+            } else if (message.includes("GitHub rate limit reached") && !hasOwnToken) {
+                setOfferInternal(true);
             }
             setError(message);
             toast.error(message, { className: "bg-red-500 text-white" });
-        } finally {
-            if (showTokenInternalTokenPrompt) {
-                setUseInternalTokens(false)
-                setShowTokenInternalTokenPrompt(false)
-            }
         }
     }
 
@@ -118,56 +156,108 @@ export default function GitHubForm() {
                     className="px-2"
                 >
                     <KeyRound className="size-3.5" />
-                    {showToken ? "Hide token" : "Include private repos"}
+                    {showToken ? "Hide token" : "Add your token for better analytics"}
                 </GhButton>
-                <Chip tone={token ? "success" : "default"}>
-                    {token ? "authenticated scope" : "public scope"}
+                <Chip tone={hasOwnToken ? "success" : sharedActive ? "primary" : "default"}>
+                    {hasOwnToken
+                        ? "your token"
+                        : sharedActive
+                            ? "shared token"
+                            : "public scope"}
                 </Chip>
             </div>
 
             {showToken ? (
                 <div className="mt-3 rounded-xl border border-border-strong bg-(--background)/50 p-3">
                     <GhInput
+                        autoFocus
                         type="password"
                         value={token}
                         onChange={(e) => setToken(e.target.value)}
-                        placeholder="ghp_… fine-grained token with read-only repo scope"
+                        placeholder="github_pat_… fine-grained, read-only"
                         autoComplete="off"
                         className="font-mono"
-                        aria-label="GitHub personal access token"
+                        aria-label="GitHub fine-grained personal access token"
                     />
+                    <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+                        <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                        <span>
+                            A fine-grained token unlocks better analytics: your full-year
+                            contribution calendar (without one, only ~90 days), GitHub&apos;s higher
+                            rate limit (5,000 requests/hour instead of 60), no shared-quota cap, and
+                            activity from private repositories you own.{" "}
+                            <a
+                                href={NEW_FINE_GRAINED_TOKEN}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-0.5 text-primary hover:underline"
+                            >
+                                Create one <ExternalLink className="size-3" />
+                            </a>
+                        </span>
+                    </p>
+                    <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
+                        <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                        <span>
+                            Private <em>contributions</em> only show up if you&apos;ve enabled them
+                            on your profile.{" "}
+                            <a
+                                href={PRIVATE_CONTRIBUTIONS_DOCS}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-0.5 text-primary hover:underline"
+                            >
+                                How to check <ExternalLink className="size-3" />
+                            </a>
+                        </span>
+                    </p>
                     <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
                         <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-success" />
                         Used only for this request, kept in memory, never written to storage or a
-                        database. Use a read-only, fine-grained token and revoke it any time.
+                        database. Use a read-only token and revoke it any time.
                     </p>
                 </div>
             ) : null}
-            {showTokenInternalTokenPrompt && error ? (
+
+            {internalExhausted ? (
+                <div className="mt-3 rounded-xl border border-attention/40 bg-attention/10 p-3 text-xs">
+                    <p className="font-medium text-foreground">
+                        The shared token allows 2 requests per 5 minutes, and yours are used up.
+                    </p>
+                    <p className="mt-1 text-muted-foreground">
+                        Add your own fine-grained token above to continue right away
+                        {retryMinutes
+                            ? `, or try again in about ${retryMinutes} minute${retryMinutes === 1 ? "" : "s"}.`
+                            : "."}
+                    </p>
+                </div>
+            ) : null}
+
+            {offerInternal && !hasOwnToken && !internalExhausted ? (
                 <div className="mt-3">
                     <GhButton
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                            if (!useInternalToken) {
-                                setUseInternalTokens(true)
-                                return
-                            }
-                            setUseInternalTokens(false)
-                            setShowTokenInternalTokenPrompt(false)
-                        }}
+                        onClick={() => setUseInternal((v) => !v)}
                         className="px-2"
                     >
                         <KeyRound className="size-3.5" />
-                        {!useInternalToken ? "Use our internal token (1 more req)" : "Remove internal token"}
+                        {useInternal
+                            ? "Stop using shared token"
+                            : "Use our shared token (2 requests / 5 min)"}
                     </GhButton>
-                    {useInternalToken &&
+                    <p className="mt-2 text-xs text-muted-foreground">
+                        GitHub limits anonymous requests. You can borrow our token for 2 requests
+                        every 5 minutes, or add your own token for unlimited use within GitHub&apos;s
+                        own limits.
+                    </p>
+                    {useInternal ? (
                         <p className="mt-2 flex items-start gap-1.5 text-xs text-primary">
                             <ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-success" />
-                            Using our internal fine-grained GitHub token for your next request.
+                            Your next request will use our shared GitHub token.
                         </p>
-                    }
+                    ) : null}
                 </div>
             ) : null}
         </form>

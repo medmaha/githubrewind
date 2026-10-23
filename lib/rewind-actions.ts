@@ -3,14 +3,47 @@
 import { z } from "zod";
 
 import { buildRewind } from "./github.api";
-import { enforceRateLimit } from "./rate-limit.server";
+import { checkInternalTokenLimit, enforceRateLimit } from "./rate-limit.server";
 import { generateInsights } from "./ai-insights";
 import { insightsInputSchema, rewindInputSchema } from "./rewind-schemas";
+import type { InternalRewindResult } from "./rewind-types";
 
-export const analyzeGithubServer = async (payload: unknown) => {
+/**
+ * Runs a rewind with OUR token. Capped at 2 requests / 5 min / IP.
+ * Any user-supplied token in the payload is deliberately ignored here: users with their
+ * own token run the request in the browser and never touch the shared quota.
+ */
+export const analyzeGithubServer = async (payload: unknown): Promise<InternalRewindResult> => {
     const data = rewindInputSchema.parse(payload);
-    await enforceRateLimit("api");
-    return buildRewind(data.username, data.year, process.env.INTERNAL_GITHUB_API_TOKEN);
+
+    const limit = await checkInternalTokenLimit();
+    if (!limit.ok) {
+        return {
+            ok: false,
+            code: "INTERNAL_LIMIT",
+            message:
+                limit.reason === "rate_limit"
+                    ? "Shared token limit reached (2 requests per 5 minutes)."
+                    : "Request blocked.",
+            retryAt: limit.reason === "rate_limit" ? limit.retryAt : null,
+        };
+    }
+
+    try {
+        const result = await buildRewind(
+            data.username,
+            data.year,
+            process.env.INTERNAL_GITHUB_API_TOKEN,
+        );
+        return { ok: true, data: result };
+    } catch (e) {
+        return {
+            ok: false,
+            code: "ERROR",
+            message: (e as Error).message || "Something went wrong",
+            retryAt: null,
+        };
+    }
 };
 
 export const getAiInsights = async (payload: unknown) => {

@@ -1,5 +1,7 @@
 import type {
     Achievement,
+    CalendarData,
+    CalendarDay,
     LanguageStat,
     MonthlyPoint,
     RepoSummary,
@@ -38,6 +40,25 @@ async function gh<T = Json>(path: string, token?: string): Promise<T> {
     return (await res.json()) as T;
 }
 
+async function ghGraphql<T = Json>(
+    query: string,
+    variables: Record<string, unknown>,
+    token: string,
+): Promise<T> {
+    const res = await fetch(`${API}/graphql`, {
+        method: "POST",
+        headers: { ...(headers(token) as Record<string, string>), "Content-Type": "application/json" },
+        body: JSON.stringify({ query, variables }),
+    });
+    if (res.status === 401) throw new Error("The provided GitHub token is invalid or expired.");
+    if (res.status === 403 || res.status === 429)
+        throw new Error("GitHub rate limit reached. Add a personal access token for higher limits and try again.");
+    if (!res.ok) throw new Error(`GitHub GraphQL request failed (${res.status}).`);
+    const json = (await res.json()) as { data?: T; errors?: { message: string }[] };
+    if (json.errors?.length) throw new Error(json.errors[0]?.message ?? "GraphQL error");
+    return json.data as T;
+}
+
 async function safe<T>(fn: () => Promise<T>, fallback: T, notes: string[], label: string) {
     try {
         return await fn();
@@ -55,9 +76,16 @@ async function searchCount(q: string, token?: string) {
     return data.total_count ?? 0;
 }
 
-async function fetchRepos(login: string, token: string | undefined, notes: string[]) {
+async function fetchRepos(
+    login: string,
+    token: string | undefined,
+    notes: string[],
+    isSelf: boolean,
+) {
     const repos: Json[] = [];
-    const base = token
+    // `/user/repos` lists the TOKEN OWNER's repos, so only use it when that owner is the
+    // user being searched. Otherwise we'd show the token owner's repositories for any username.
+    const base = token && isSelf
         ? `/user/repos?affiliation=owner,collaborator,organization_member`
         : `/users/${login}/repos?type=owner`;
     for (let page = 1; page <= 3; page++) {
@@ -158,11 +186,17 @@ async function fetchEvents(login: string, token: string | undefined) {
     return events;
 }
 
-function buildMonthly(events: GithubEvent[], repos: Json[], year: number): MonthlyPoint[] {
+function buildMonthly(
+    events: GithubEvent[],
+    repos: Json[],
+    year: number,
+    calendar: CalendarData | null,
+): MonthlyPoint[] {
     const months = Array.from({ length: 12 }, (_, i) => ({
         month: new Date(Date.UTC(year, i, 1)).toLocaleString("en-US", { month: "short" }),
         commits: 0,
         repos: 0,
+        contributions: 0,
     }));
     for (const e of events) {
         const d = new Date(e.created_at);
@@ -175,14 +209,23 @@ function buildMonthly(events: GithubEvent[], repos: Json[], year: number): Month
         const bucket = months[d.getUTCMonth()];
         if (bucket && d.getUTCFullYear() === year) bucket.repos += 1;
     }
+    if (calendar) {
+        for (const day of calendar.days) {
+            const bucket = months[Number(day.date.slice(5, 7)) - 1];
+            if (bucket) bucket.contributions += day.count;
+        }
+    } else {
+        for (const m of months) m.contributions = m.commits;
+    }
     return months;
 }
 
+/** Fallback when there is no calendar: derived from the (short) public event feed. */
 function streakStats(events: GithubEvent[], year: number) {
     const days = new Set<string>();
     for (const e of events) {
         const d = new Date(e.created_at);
-        if (d.getFullYear() === year) days.add(d.toISOString().slice(0, 10));
+        if (d.getUTCFullYear() === year) days.add(d.toISOString().slice(0, 10));
     }
     const sorted = [...days].sort();
     let longest = 0;
@@ -195,6 +238,96 @@ function streakStats(events: GithubEvent[], year: number) {
         longest = Math.max(longest, current);
     }
     return { activeDays: days.size, longestStreak: longest };
+}
+
+const CALENDAR_QUERY = `
+query RewindCalendar($login: String!, $from: DateTime!, $to: DateTime!) {
+  viewer { login }
+  user(login: $login) {
+    contributionsCollection(from: $from, to: $to) {
+      totalCommitContributions
+      totalPullRequestContributions
+      totalPullRequestReviewContributions
+      totalIssueContributions
+      totalRepositoryContributions
+      restrictedContributionsCount
+      contributionCalendar {
+        totalContributions
+        weeks { contributionDays { date contributionCount } }
+      }
+      commitContributionsByRepository(maxRepositories: 10) {
+        repository { nameWithOwner url isPrivate }
+        contributions { totalCount }
+      }
+    }
+  }
+}`;
+
+type CalendarResult = { calendar: CalendarData; viewerLogin: string | null };
+
+/** Full-year daily contribution counts. GraphQL always requires a token. */
+async function fetchCalendar(login: string, year: number, token: string): Promise<CalendarResult> {
+    const now = new Date();
+    const end =
+        year === now.getUTCFullYear() ? now : new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+    const data = await ghGraphql<Json>(
+        CALENDAR_QUERY,
+        { login, from: `${year}-01-01T00:00:00Z`, to: end.toISOString() },
+        token,
+    );
+    const cc = data?.user?.contributionsCollection;
+    if (!cc) throw new Error("no contribution data returned");
+
+    const days: CalendarDay[] = [];
+    for (const week of cc.contributionCalendar.weeks as Json[]) {
+        for (const d of week.contributionDays as Json[]) {
+            if (typeof d.date === "string" && d.date.startsWith(`${year}-`))
+                days.push({ date: d.date, count: d.contributionCount ?? 0 });
+        }
+    }
+    days.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+
+    const repoCommits = ((cc.commitContributionsByRepository ?? []) as Json[])
+        .map((r) => ({
+            fullName: r.repository.nameWithOwner as string,
+            url: r.repository.url as string,
+            isPrivate: Boolean(r.repository.isPrivate),
+            commits: (r.contributions?.totalCount ?? 0) as number,
+        }))
+        .sort((a, b) => b.commits - a.commits);
+
+    return {
+        viewerLogin: data?.viewer?.login ?? null,
+        calendar: {
+            days,
+            totalContributions: cc.contributionCalendar.totalContributions ?? 0,
+            restrictedContributions: cc.restrictedContributionsCount ?? 0,
+            breakdown: {
+                commits: cc.totalCommitContributions ?? 0,
+                prs: cc.totalPullRequestContributions ?? 0,
+                reviews: cc.totalPullRequestReviewContributions ?? 0,
+                issues: cc.totalIssueContributions ?? 0,
+                newRepos: cc.totalRepositoryContributions ?? 0,
+            },
+            repoCommits,
+        },
+    };
+}
+
+function streakFromDays(days: CalendarDay[]) {
+    let activeDays = 0;
+    let longestStreak = 0;
+    let current = 0;
+    for (const d of days) {
+        if (d.count > 0) {
+            activeDays++;
+            current++;
+            longestStreak = Math.max(longestStreak, current);
+        } else {
+            current = 0;
+        }
+    }
+    return { activeDays, longestStreak };
 }
 
 function buildAchievements(data: Omit<RewindData, "achievements">): Achievement[] {
@@ -223,22 +356,22 @@ function buildAchievements(data: Omit<RewindData, "achievements">): Achievement[
 
     if (data.languages.length >= 6)
         push("polyglot", "Polyglot", `${data.languages.length} languages in active use`, "gold");
-    else if (data.languages.length >= 3)
+    else if (data.languages.length >= 4)
         push("multilingual", "Multilingual", `${data.languages.length} languages used`, "silver");
 
     if (t.longestStreak >= 14)
         push("streak", "Streak Runner", `${t.longestStreak}-day activity streak`, "gold");
-    else if (t.longestStreak >= 5)
+    else if (t.longestStreak >= 8)
         push("momentum", "Momentum", `${t.longestStreak}-day activity streak`, "silver");
 
-    if (t.reposCreatedThisYear >= 10)
+    if (t.reposCreatedThisYear >= 15)
         push(
             "builder",
             "Serial Builder",
             `${t.reposCreatedThisYear} new repositories in ${data.year}`,
             "gold",
         );
-    else if (t.reposCreatedThisYear > 0)
+    else if (t.reposCreatedThisYear > 2)
         push(
             "starter",
             "Fresh Starts",
@@ -251,7 +384,7 @@ function buildAchievements(data: Omit<RewindData, "achievements">): Achievement[
         push("reviewer", "Code Reviewer", `${t.reviews} reviews contributed`, "gold");
     if (data.profile.followers >= 100)
         push("community", "Community Magnet", `${data.profile.followers} followers`, "silver");
-    if (t.commitsThisYear >= 500)
+    if (t.commitsThisYear >= 1000)
         push(
             "commit-machine",
             "Commit Machine",
@@ -274,38 +407,68 @@ export async function buildRewind(
     const user = await gh<Json>(`/users/${username}`, token);
     const login: string = user.login;
 
+    // Full-year contribution calendar. GraphQL needs a token (the user's own, or the shared one).
+    const cal = token
+        ? await safe<CalendarResult | null>(
+            () => fetchCalendar(login, year, token),
+            null,
+            notes,
+            "Contribution calendar",
+        )
+        : null;
+    const calendar = cal?.calendar ?? null;
+    if (!token)
+        notes.push(
+            "Full-year activity needs a GitHub token. Without one, activity covers roughly the last 90 days.",
+        );
+    if (calendar && calendar.restrictedContributions > 0)
+        notes.push(
+            `Includes ${calendar.restrictedContributions} private contributions this user chose to show on their profile.`,
+        );
+
+    // Private repos are only listed when the token belongs to the user being searched.
+    const isSelf = Boolean(cal?.viewerLogin && cal.viewerLogin.toLowerCase() === login.toLowerCase());
+    if (token && !isSelf)
+        notes.push("Private repositories are only included when the token belongs to this user.");
+
     const [rawRepos, events] = await Promise.all([
-        fetchRepos(login, token, notes),
+        fetchRepos(login, token, notes, isSelf),
         safe(() => fetchEvents(login, token), [] as Json[], notes, "Recent event feed"),
     ]);
 
     const { languages, totalBytes } = await fetchLanguages(rawRepos, token, notes);
 
     const [prs, prsMerged, issues, reviews, commitsThisYear] = await Promise.all([
-        safe(
-            () => searchCount(`author:${login} type:pr created:${from}..${to}`, token),
-            0,
-            notes,
-            "PR count",
-        ),
+        calendar
+            ? Promise.resolve(calendar.breakdown.prs)
+            : safe(
+                () => searchCount(`author:${login} type:pr created:${from}..${to}`, token),
+                0,
+                notes,
+                "PR count",
+            ),
         safe(
             () => searchCount(`author:${login} type:pr is:merged created:${from}..${to}`, token),
             0,
             notes,
             "Merged PR count",
         ),
-        safe(
-            () => searchCount(`author:${login} type:issue created:${from}..${to}`, token),
-            0,
-            notes,
-            "Issue count",
-        ),
-        safe(
-            () => searchCount(`reviewed-by:${login} type:pr updated:${from}..${to}`, token),
-            0,
-            notes,
-            "Review count",
-        ),
+        calendar
+            ? Promise.resolve(calendar.breakdown.issues)
+            : safe(
+                () => searchCount(`author:${login} type:issue created:${from}..${to}`, token),
+                0,
+                notes,
+                "Issue count",
+            ),
+        calendar
+            ? Promise.resolve(calendar.breakdown.reviews)
+            : safe(
+                () => searchCount(`reviewed-by:${login} type:pr updated:${from}..${to}`, token),
+                0,
+                notes,
+                "Review count",
+            ),
         safe(
             async () => {
                 const res = await fetch(
@@ -326,18 +489,24 @@ export async function buildRewind(
     const owned = repos.filter((r) => !r.isFork);
     const stars = owned.reduce((acc, r) => acc + r.stars, 0);
     const forks = owned.reduce((acc, r) => acc + r.forks, 0);
-    const { activeDays, longestStreak } = streakStats(events, year);
+    const { activeDays, longestStreak } = calendar
+        ? streakFromDays(calendar.days)
+        : streakStats(events, year);
 
     const pushCommits = events
         .filter((e) => e.type === "PushEvent")
         .reduce((acc, e) => acc + (e.payload?.commits?.length ?? 1), 0);
+
+    const yearCommits = calendar
+        ? Math.max(commitsThisYear, calendar.breakdown.commits)
+        : Math.max(commitsThisYear, pushCommits);
 
     // Rough LOC estimate: GitHub reports repo size in KB; ~55 bytes per line of code.
     const estimatedLinesOfCode = Math.round(totalBytes / 55);
 
     const base: Omit<RewindData, "achievements"> = {
         year,
-        scope: token ? "authenticated" : "public",
+        scope: isSelf ? "authenticated" : "public",
         generatedAt: new Date().toISOString(),
         profile: {
             login,
@@ -359,8 +528,8 @@ export async function buildRewind(
             privateRepos: repos.filter((r) => r.isPrivate).length,
             stars,
             forks,
-            commits: Math.max(commitsThisYear, pushCommits),
-            commitsThisYear: Math.max(commitsThisYear, pushCommits),
+            commits: yearCommits,
+            commitsThisYear: yearCommits,
             prs,
             prsMerged,
             issues,
@@ -375,7 +544,8 @@ export async function buildRewind(
         recentRepos: [...repos]
             .sort((a, b) => Date.parse(b.pushedAt) - Date.parse(a.pushedAt))
             .slice(0, 6),
-        monthly: buildMonthly(events, rawRepos, year),
+        monthly: buildMonthly(events, rawRepos, year, calendar),
+        calendar,
         notes,
         events,
     };
