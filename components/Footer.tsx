@@ -3,19 +3,19 @@ import { ExternalLink } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="text-card-foreground py-6 bg-linear-to-br to-background from-card-800">
+        <footer className="border-t border-border py-6 text-muted-foreground">
             <div className="flex items-center justify-center">
                 <GithubIconLink className="w-auto px-2 gap-3">
                     <div className="flex gap-3 items-center">
-                        <small className="underline underline-offset-2 text-black/70 text-[12px]">
-                            medmaha/github-activity-rewind
+                        <small className="text-[12px] text-muted-foreground hover:text-primary">
+                            medmaha/git-rewind
                         </small>
-                        <ExternalLink className="w-3 h-3 text-black/70 text-[12px]" />
+                        <ExternalLink className="h-3 w-3 text-muted-foreground" />
                     </div>
                 </GithubIconLink>
             </div>
             <div className="container flex items-center justify-center px-4 mt-4">
-                <p>&copy; {new Date().getFullYear()}. All rights Reserved</p>
+                <p className="text-xs">© {new Date().getFullYear()} GitHub Rewind</p>
             </div>
         </footer>
     );
