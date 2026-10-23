@@ -30,7 +30,7 @@ type RewindState = {
 };
 
 const currentYear = new Date().getUTCFullYear();
-export const REWIND_STORAGE_KEY = "github-activity-rewind";
+export const REWIND_STORAGE_KEY = "github.rewind";
 
 export const useRewindStore = create<RewindState>()(
     persist(

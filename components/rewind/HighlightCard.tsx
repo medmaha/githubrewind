@@ -166,7 +166,7 @@ export function HighlightCard({
         ctx.fillText(yearText, W - padX, y + 24);
         ctx.fillStyle = PALETTE.muted;
         ctx.font = "600 15px ui-sans-serif, -apple-system, Segoe UI, sans-serif";
-        ctx.fillText("GITHUB REWIND", W - padX, y + 50);
+        ctx.fillText("GITHUBREWIND", W - padX, y + 50);
         ctx.textAlign = "left";
 
         // Headline
@@ -308,7 +308,7 @@ export function HighlightCard({
                     ref={canvasRef}
                     className="block h-auto w-full"
                     role="img"
-                    aria-label={`GitHub Rewind ${data.year} highlight card for ${data.profile.login}`}
+                    aria-label={`GithubRewind ${data.year} highlight card for ${data.profile.login}`}
                 />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">

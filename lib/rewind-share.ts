@@ -59,7 +59,7 @@ export function buildShareText(
     }
 
     const body = [
-        `${name}'s ${data.year} GitHub Rewind - ${insights.personaTitle}`,
+        `${name}'s ${data.year} GithubRewind - ${insights.personaTitle}`,
         "",
         insights.yearlyOverview,
         "",

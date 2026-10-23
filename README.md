@@ -1,6 +1,6 @@
 # GitHub Activity Rewind
 
-GitHub Rewind turns a year of GitHub activity into a visual review of commits, pull requests, issues, reviews, repositories, languages, achievements, and activity patterns. It can also generate an AI-written year-in-review and a shareable highlight card.
+GithubRewind turns a year of GitHub activity into a visual review of commits, pull requests, issues, reviews, repositories, languages, achievements, and activity patterns. It can also generate an AI-written year-in-review and a shareable highlight card.
 
 ## Features
 
@@ -40,8 +40,8 @@ GitHub Rewind turns a year of GitHub activity into a visual review of commits, p
 ### Installation
 
 ```bash
-git clone https://github.com/mahammed-toures/github-activity-rewind.git
-cd github-activity-rewind
+git clone https://github.com/mahammed-toures/githubrewind.git
+cd githubrewind
 pnpm install
 ```
 
@@ -84,7 +84,7 @@ and insights.
 
 ## Feedback Database
 
-Feedback persistence is optional. When `DATABASE_URL` is not configured, the main GitHub rewind experience and AI insights can still be used, but feedback submissions cannot be stored.
+Feedback persistence is optional. When `DATABASE_URL` is not configured, the main GithubRewind experience and AI insights can still be used, but feedback submissions cannot be stored.
 
 The app expects a PostgreSQL table named `feedbacks` with this shape:
 

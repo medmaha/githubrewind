@@ -29,7 +29,7 @@ export default function StoredDataPage() {
             setStoredBytes(persistedValue ? new TextEncoder().encode(persistedValue).length : 0);
             setStorageError(null);
         } catch (error) {
-            console.error("Unable to measure saved GitHub Rewind data.", error);
+            console.error("Unable to measure saved GithubRewind data.", error);
             setStoredBytes(null);
             setStorageError("Could not read this app's saved data size from browser storage.");
         }
@@ -45,7 +45,7 @@ export default function StoredDataPage() {
     async function clearSavedData() {
         if (!hasSavedData || clearing) return;
         const confirmed = window.confirm(
-            "Clear all GitHub Rewind data saved by this app from this browser? This cannot be undone.",
+            "Clear all GithubRewind data saved by this app from this browser? This cannot be undone.",
         );
         if (!confirmed) return;
 
@@ -53,9 +53,9 @@ export default function StoredDataPage() {
         try {
             reset();
             await useRewindStore.persist.clearStorage();
-            toast.success("Saved GitHub Rewind data cleared");
+            toast.success("Saved GithubRewind data cleared");
         } catch (error) {
-            console.error("Unable to clear saved GitHub Rewind data.", error);
+            console.error("Unable to clear saved GithubRewind data.", error);
             toast.error("Could not clear saved data. Please try again.");
         } finally {
             setClearing(false);
@@ -70,7 +70,7 @@ export default function StoredDataPage() {
                 </p>
                 <h1 className="mt-1 text-3xl font-semibold tracking-tight">Saved data</h1>
                 <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                    Review the GitHub Rewind information this app has saved in this browser. Your
+                    Review the GithubRewind information this app has saved in this browser. Your
                     data stays in local storage on this device.
                 </p>
             </header>
@@ -83,7 +83,7 @@ export default function StoredDataPage() {
                 <>
                     <Panel>
                         <PanelHeader
-                            title="Stored by GitHub Rewind"
+                            title="Stored by GithubRewind"
                             hint="The app currently stores one local-storage record for your latest rewind."
                             action={
                                 <GhButton
@@ -142,7 +142,7 @@ export default function StoredDataPage() {
                             </dl>
                         ) : (
                             <p className="text-sm text-muted-foreground">
-                                This app has no GitHub Rewind data saved in this browser.
+                                This app has no GithubRewind data saved in this browser.
                             </p>
                         )}
                     </Panel>

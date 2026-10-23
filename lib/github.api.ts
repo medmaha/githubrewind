@@ -16,7 +16,7 @@ type Json = any;
 function headers(token?: string): HeadersInit {
     const h: Record<string, string> = {
         Accept: "application/vnd.github+json",
-        "User-Agent": "github-activity-rewind",
+        "User-Agent": "githubrewind",
         "X-GitHub-Api-Version": "2022-11-28",
     };
     if (token) h["Authorization"] = `Bearer ${token}`;
