@@ -22,8 +22,8 @@ export default function TopNav() {
                 <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 bg-white rounded-full overflow-hidden flex justify-center items-center">
                         <Image
-                            src="/github.png"
-                            alt="github logo"
+                            src="/logo.png"
+                            alt="github rewind logo"
                             width={20}
                             height={20}
                             priority
