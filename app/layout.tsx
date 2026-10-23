@@ -2,6 +2,7 @@ import AppQueryProvider from "@/providers/query-provider";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
+import { SiteShell } from "@/components/SiteShell";
 
 export const metadata: Metadata = {
     title: process.env.NODE_ENV === "development" ? "DEV | Rewind-Github" : "Rewind-Github",
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en" className="scroll-smooth">
             <body>
-                <AppQueryProvider>{children}</AppQueryProvider>
+                <AppQueryProvider>
+                    <SiteShell>{children}</SiteShell>
+                </AppQueryProvider>
                 <Toaster />
             </body>
         </html>

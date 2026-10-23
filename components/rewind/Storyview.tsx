@@ -5,6 +5,12 @@ import { BookOpen, ExternalLink } from "lucide-react";
 
 import { buildChapters } from "@/lib/chapters";
 import type { CalendarData, Chapter, RewindData } from "@/lib/rewind-types";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Panel, PanelHeader } from "./primitives";
 
 const CELL = 10;
@@ -17,8 +23,12 @@ function YearHeatmap({ calendar, chapter }: { calendar: CalendarData; chapter: C
     const cells = useMemo(() => {
         const { days } = calendar;
         if (days.length === 0) return { items: [], cols: 0 };
-        const counts = days.filter((d) => d.count > 0).map((d) => d.count).sort((a, b) => a - b);
-        const q = (p: number) => counts[Math.min(counts.length - 1, Math.floor(counts.length * p))] ?? 0;
+        const counts = days
+            .filter((d) => d.count > 0)
+            .map((d) => d.count)
+            .sort((a, b) => a - b);
+        const q = (p: number) =>
+            counts[Math.min(counts.length - 1, Math.floor(counts.length * p))] ?? 0;
         const [q1, q2, q3] = [q(0.25), q(0.5), q(0.75)];
         const level = (c: number) => (c === 0 ? 0 : c <= q1 ? 1 : c <= q2 ? 2 : c <= q3 ? 3 : 4);
 
@@ -46,8 +56,8 @@ function YearHeatmap({ calendar, chapter }: { calendar: CalendarData; chapter: C
                 const dim = range
                     ? c.date < range.from || c.date > range.to
                     : weekday !== undefined
-                        ? c.row !== weekday
-                        : false;
+                      ? c.row !== weekday
+                      : false;
                 return (
                     <rect
                         key={c.date}
@@ -74,7 +84,21 @@ function YearHeatmap({ calendar, chapter }: { calendar: CalendarData; chapter: C
 
 export function StoryView({ data }: { data: RewindData }) {
     const chapters = useMemo(() => buildChapters(data), [data]);
-    if (!data.calendar || chapters.length === 0) return null;
+    if (!data.calendar || chapters.length === 0) {
+        return (
+            <Panel>
+                <PanelHeader
+                    icon={<BookOpen className="size-4" />}
+                    title="No chapters available yet"
+                />
+                <p className="text-sm text-muted-foreground">
+                    {data.calendar
+                        ? "There was not enough contribution activity in this calendar to form chapters."
+                        : "Stories need a full-year contribution calendar. Add a read-only GitHub token when generating your rewind to fetch that calendar."}
+                </p>
+            </Panel>
+        );
+    }
     const { calendar } = data;
 
     return (
@@ -84,54 +108,61 @@ export function StoryView({ data }: { data: RewindData }) {
                 title={`Your ${data.year}, in chapters`}
                 hint="Every line below is computed from your contribution calendar, with links to check it on GitHub."
             />
-            <ol className="space-y-3">
+            <Accordion type="single" collapsible className="space-y-3">
                 {chapters.map((c, i) => (
-                    <li
+                    <AccordionItem
                         key={c.id}
-                        className="rounded-xl border border-border bg-(--elevated)/50 p-4"
+                        value={c.id}
+                        className="rounded-xl border border-border bg-(--elevated)/50 px-4"
                     >
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="min-w-0">
-                                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                                    Chapter {i + 1}
-                                </p>
-                                <h3 className="mt-0.5 text-base font-semibold tracking-tight">
-                                    {c.title}
-                                </h3>
-                                <p className="mt-2 text-sm text-foreground">{c.headline}</p>
-                                {c.detail ? (
-                                    <p className="mt-1 text-xs text-muted-foreground">{c.detail}</p>
-                                ) : null}
-                                {c.evidence.length ? (
-                                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                                        {c.evidence.map((e) => (
-                                            <li key={e.url}>
-                                                <a
-                                                    href={e.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                                                >
-                                                    {e.label} <ExternalLink className="size-3" />
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : null}
+                        <AccordionTrigger className="gap-4 py-4 hover:no-underline">
+                            <div className="flex min-w-0 flex-1 flex-col gap-3 text-left sm:flex-row sm:items-center sm:justify-between">
+                                <div className="min-w-0">
+                                    <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                                        Chapter {i + 1}
+                                    </p>
+                                    <h3 className="mt-0.5 text-base font-semibold tracking-tight">
+                                        {c.title}
+                                    </h3>
+                                    <p className="mt-2 text-sm font-normal text-foreground">
+                                        {c.headline}
+                                    </p>
+                                </div>
+                                <div className="shrink-0 sm:text-right">
+                                    <p className="font-mono text-2xl font-semibold tabular-nums text-primary">
+                                        {c.stat.value}
+                                    </p>
+                                    <p className="text-xs font-normal text-muted-foreground">
+                                        {c.stat.label}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="shrink-0 sm:text-right">
-                                <p className="font-mono text-2xl font-semibold tabular-nums text-primary">
-                                    {c.stat.value}
-                                </p>
-                                <p className="text-xs text-muted-foreground">{c.stat.label}</p>
-                            </div>
-                        </div>
-                        <div className="mt-4">
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4">
+                            {c.detail ? (
+                                <p className="mb-3 text-xs text-muted-foreground">{c.detail}</p>
+                            ) : null}
+                            {c.evidence.length ? (
+                                <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1">
+                                    {c.evidence.map((e) => (
+                                        <li key={e.url}>
+                                            <a
+                                                href={e.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                            >
+                                                {e.label} <ExternalLink className="size-3" />
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
                             <YearHeatmap calendar={calendar} chapter={c} />
-                        </div>
-                    </li>
+                        </AccordionContent>
+                    </AccordionItem>
                 ))}
-            </ol>
+            </Accordion>
         </Panel>
     );
 }

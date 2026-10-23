@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     ExternalLink,
     GitBranch,
@@ -54,6 +55,7 @@ function minutesUntil(ts: number | null) {
 }
 
 export default function GitHubForm() {
+    const router = useRouter();
     const [showToken, setShowToken] = useState(false);
     // The shared token's 2-per-5-min quota is spent -> user must bring their own token.
     const [internalExhausted, setInternalExhausted] = useState<{ retryAt: number | null } | null>(
@@ -93,6 +95,7 @@ export default function GitHubForm() {
             setData(data);
             setInternalExhausted(null);
             toast.success(`Rewind ready for @${data.profile.login}`);
+            router.push("/rewind");
         } catch (err) {
             const message = (err as Error).message || "Something went wrong";
 

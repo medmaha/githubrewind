@@ -5,6 +5,7 @@ GitHub Rewind turns a year of GitHub activity into a visual review of commits, p
 ## Features
 
 - Analyze a GitHub username for a selected year
+- Browse fetched metrics, data-based Stories, and AI Insights on separate pages
 - Use public GitHub data without signing in
 - Optionally provide a read-only fine-grained GitHub token to include private repositories
 - Generate factual AI insights with Google Gemini
@@ -72,6 +73,14 @@ Open [http://localhost:3000](http://localhost:3000).
 The GitHub token is not a server environment variable. Users can optionally enter a read-only fine-grained token in the app when they want private repository data included. It is used for the request only and kept in memory.
 
 Never commit `.env.local` or share API keys, database credentials, GitHub tokens, or deployment tokens. If a credential is exposed, revoke or rotate it immediately.
+
+After generating a rewind, use the in-app navigation to switch between `/rewind` (fetched
+metrics), `/stories` (calendar-based chapters), and `/insights` (AI narrative and share cards).
+The footer's `/_data` page shows the complete record stored locally and lets users clear it.
+Rewind data, generated insights, and the username/year are persisted in this browser with
+Zustand persist, so they are available after a reload. Saved results are kept in this browser's
+local storage; the GitHub token is never persisted. Use **New rewind** to clear the saved rewind
+and insights.
 
 ## Feedback Database
 
