@@ -2,7 +2,7 @@ import { Brain, Loader2, Sparkles, TrendingUp, Trophy, Wand2 } from "lucide-reac
 import { toast } from "sonner";
 
 import { Panel, PanelHeader, Chip, GhButton } from "./primitives";
-import { getAiInsights } from "@/lib/rewind-actions";
+import { getAiInsightsServer } from "@/lib/rewind-actions";
 import type { InsightsSummary } from "@/lib/rewind-schemas";
 import type { RewindData } from "@/lib/rewind-types";
 import { useRewindStore } from "@/store/rewind-store";
@@ -43,7 +43,7 @@ export function InsightsPanel({ data }: { data: RewindData }) {
     async function generate() {
         startInsights();
         try {
-            const result = await getAiInsights({ summary: toSummary(data) });
+            const result = await getAiInsightsServer({ summary: toSummary(data) });
             setInsights(result);
             toast.success("AI insights generated");
         } catch (error) {

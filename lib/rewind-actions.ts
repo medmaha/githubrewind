@@ -10,7 +10,7 @@ import type { InternalRewindResult } from "./rewind-types";
 
 /**
  * Runs a rewind with OUR token. Capped at 2 requests / 5 min / IP.
- * Any user-supplied token in the payload is deliberately ignored here: users with their
+ * - Any user-supplied token in the payload is deliberately ignored here: users with their
  * own token run the request in the browser and never touch the shared quota.
  */
 export const analyzeGithubServer = async (payload: unknown): Promise<InternalRewindResult> => {
@@ -46,7 +46,7 @@ export const analyzeGithubServer = async (payload: unknown): Promise<InternalRew
     }
 };
 
-export const getAiInsights = async (payload: unknown) => {
+export const getAiInsightsServer = async (payload: unknown) => {
     const data = insightsInputSchema.parse(payload);
     await enforceInsightsRateLimit();
     return generateInsights(data.summary as z.infer<typeof insightsInputSchema>["summary"]);
