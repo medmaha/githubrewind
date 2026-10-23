@@ -8,7 +8,7 @@ export function Footer() {
             <div className="flex flex-wrap sm:items-center gap-2">
                 <p className="text-xs">© 2024-{new Date().getFullYear()} GitHub Rewind</p>
                 <Link href={"/_data"} className="text-xs underline underline-offset-2">
-                    Data
+                    Data & Storage
                 </Link>
             </div>
             <Link

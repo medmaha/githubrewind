@@ -56,8 +56,8 @@ function YearHeatmap({ calendar, chapter }: { calendar: CalendarData; chapter: C
                 const dim = range
                     ? c.date < range.from || c.date > range.to
                     : weekday !== undefined
-                      ? c.row !== weekday
-                      : false;
+                        ? c.row !== weekday
+                        : false;
                 return (
                     <rect
                         key={c.date}
@@ -108,10 +108,11 @@ export function StoryView({ data }: { data: RewindData }) {
                 title={`Your ${data.year}, in chapters`}
                 hint="Every line below is computed from your contribution calendar, with links to check it on GitHub."
             />
-            <Accordion type="single" collapsible className="space-y-3">
+            <Accordion defaultValue={[chapters?.[0].id || "opening"]} type="multiple" className="space-y-3">
                 {chapters.map((c, i) => (
                     <AccordionItem
                         key={c.id}
+                        defaultChecked={i === 0}
                         value={c.id}
                         className="rounded-xl border border-border bg-(--elevated)/50 px-4"
                     >
