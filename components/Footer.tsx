@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
@@ -15,23 +14,17 @@ export function Footer() {
                 href="https://github.com/medmaha/githubrewind"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={"inline-flex items-center justify-center gap-2 w-max"}
+                className={"inline-flex items-center justify-center bg-white rounded-full w-7 h-7"}
             >
-                <div className="w-7 h-7 bg-white rounded-full overflow-hidden flex justify-center items-center">
-                    <Image
-                        src="/github.png"
-                        alt="github logo"
-                        width={18}
-                        height={18}
-                        priority
-                        fetchPriority="high"
-                        className={"w-6 h-6"}
-                    />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                    Github-Rewind
-                </p>
-                <ExternalLink size={16} />
+                <Image
+                    src="/github.png"
+                    alt="github logo"
+                    width={16}
+                    height={16}
+                    priority
+                    fetchPriority="high"
+                    className={"w-6 h-6"}
+                />
             </Link>
 
         </footer >
