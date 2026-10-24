@@ -1,8 +1,8 @@
 {
-  "name": "rewind-github",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "githubrewind",
+  "version": "0.1.1",
+  "description": "Get your GitHub activity for any year",
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "start": "next start",
