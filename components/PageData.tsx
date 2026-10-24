@@ -9,6 +9,7 @@ import {
     StatsGrid,
 } from "./rewind/StatsWidgets";
 import { Panel } from "./rewind/primitives";
+import { CoveragePanel } from "./rewind/CoveragePanel";
 import { YearComparison } from "./rewind/YearComparison";
 
 export default function PageData() {
@@ -20,6 +21,7 @@ export default function PageData() {
             <ProfileWidget data={data} />
             <StatsGrid data={data} />
             <YearComparison data={data} />
+            <CoveragePanel data={data} />
             <div className="grid gap-4 lg:grid-cols-2">
                 <LanguagesWidget data={data} />
                 <ActivityWidget data={data} />

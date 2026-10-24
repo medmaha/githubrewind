@@ -84,6 +84,7 @@ export type RewindData = {
     profile: RewindProfile;
     totals: {
         repos: number;
+        ownedRepos: number;
         reposCreatedThisYear: number;
         privateRepos: number;
         stars: number;

@@ -30,7 +30,9 @@ type RewindState = {
 };
 
 const currentYear = new Date().getUTCFullYear();
+
 export const REWIND_STORAGE_KEY = "github.rewind";
+export const REWIND_STORAGE_VERSION = 0.1;
 
 export const useRewindStore = create<RewindState>()(
     persist(
@@ -84,6 +86,7 @@ export const useRewindStore = create<RewindState>()(
         }),
         {
             name: REWIND_STORAGE_KEY,
+            version: REWIND_STORAGE_VERSION,
             storage: createJSONStorage(() => localStorage),
             skipHydration: true,
             partialize: ({ username, year, data, insights }) => ({
@@ -92,6 +95,9 @@ export const useRewindStore = create<RewindState>()(
                 data,
                 insights,
             }),
+            migrate(persistedState, version) {
+                return null;
+            },
             onRehydrateStorage: () => (state) => {
                 state?.finishHydration();
             },

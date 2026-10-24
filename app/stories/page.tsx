@@ -1,6 +1,7 @@
 "use client";
 
 import { RequireRewind } from "@/components/RequireRewind";
+import { FingerprintPanel } from "@/components/rewind/FingerprintPanel";
 import { StoryView } from "@/components/rewind/Storyview";
 import { useRewindStore } from "@/store/rewind-store";
 
@@ -21,6 +22,7 @@ export default function StoriesPage() {
                             so you can verify the moments behind them.
                         </p>
                     </header>
+                    <FingerprintPanel data={data} />
                     <StoryView data={data} />
                 </main>
             ) : null}

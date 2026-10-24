@@ -318,6 +318,7 @@ export function computeRewind(raw: RawRewind): RewindData {
         },
         totals: {
             repos: repos.length,
+            ownedRepos: owned.length,
             reposCreatedThisYear: repos.filter(
                 (r) => new Date(r.createdAt).getUTCFullYear() === year,
             ).length,
@@ -344,7 +345,7 @@ export function computeRewind(raw: RawRewind): RewindData {
         monthly: buildMonthly(events, raw.repos, year, calendar),
         calendar,
         comparison:
-            raw.comparisonContributions && year > 2010
+            raw.comparisonContributions && year > 2008
                 ? {
                       year: year - 1,
                       calendar: normalizeCalendar(raw.comparisonContributions, year - 1),
