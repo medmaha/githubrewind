@@ -111,21 +111,29 @@ export function buildChapters(data: RewindData): Chapter[] {
     }
 
     {
+        // Only a day that clearly stands out: at least 5 contributions and twice a typical active day.
+        const counts = days
+            .filter((d) => d.count > 0)
+            .map((d) => d.count)
+            .sort((a, b) => a - b);
+        const typical = counts[Math.floor(counts.length / 2)] ?? 0;
         const peak = days.reduce((best, day) => (day.count > best.count ? day : best));
-        chapters.push({
-            id: "standout-day",
-            title: "Your standout day",
-            headline: `${fmtDay(peak.date)} was your biggest day, with ${plural(peak.count, "contribution")}.`,
-            detail: "The count comes from your contribution calendar and may include commits, pull requests, reviews, and issues.",
-            stat: { value: nf(peak.count), label: "contributions in one day" },
-            range: { from: peak.date, to: peak.date },
-            evidence: [
-                {
-                    label: `Check ${fmtDay(peak.date)} on GitHub`,
-                    url: profileLink(login, peak.date, peak.date),
-                },
-            ],
-        });
+        if (peak.count >= 5 && peak.count >= typical * 2) {
+            chapters.push({
+                id: "standout-day",
+                title: "Your standout day",
+                headline: `${fmtDay(peak.date)} was your biggest day, with ${plural(peak.count, "contribution")}.`,
+                detail: `A typical active day for you had ${plural(typical, "contribution")}. Counts come from your contribution calendar and may include commits, pull requests, reviews, and issues.`,
+                stat: { value: nf(peak.count), label: "contributions in one day" },
+                range: { from: peak.date, to: peak.date },
+                evidence: [
+                    {
+                        label: `Check ${fmtDay(peak.date)} on GitHub`,
+                        url: profileLink(login, peak.date, peak.date),
+                    },
+                ],
+            });
+        }
     }
 
     // 3. Busiest week ----------------------------------------------------------------------

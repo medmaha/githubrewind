@@ -226,10 +226,15 @@ async function fetchContributions(
     return { viewerLogin: (data?.viewer?.login ?? null) as string | null, collection };
 }
 
+/**
+ * End of the PREVIOUS year's comparison window. A past year compares against the whole previous
+ * year; the current year compares year-to-date against the same month/day last year.
+ */
 function comparisonPeriodEnd(year: number, now: Date) {
-    if (year !== now.getUTCFullYear()) return new Date(Date.UTC(year, 11, 31, 23, 59, 59));
-
     const comparisonYear = year - 1;
+    if (year !== now.getUTCFullYear())
+        return new Date(Date.UTC(comparisonYear, 11, 31, 23, 59, 59));
+
     const month = now.getUTCMonth();
     const day = Math.min(
         now.getUTCDate(),
@@ -312,9 +317,11 @@ export async function fetchRewindRaw(
               "Contribution calendar",
           )
         : null;
-    const comparisonContributions =
-        token && contributions && year > 2010 && year <= new Date().getUTCFullYear()
-            ? await safe(
+    // Started now but awaited together with the repo and event requests below, so the
+    // comparison adds no extra sequential round trip.
+    const comparisonRequest =
+        token && contributions && year > 2008 && year <= new Date().getUTCFullYear()
+            ? safe(
                   () =>
                       fetchContributions(
                           login,
@@ -326,15 +333,16 @@ export async function fetchRewindRaw(
                   notes,
                   "Previous-year comparison",
               )
-            : null;
+            : Promise.resolve(null);
     const isSelf = Boolean(
         contributions?.viewerLogin &&
         contributions.viewerLogin.toLowerCase() === login.toLowerCase(),
     );
 
-    const [repos, events] = await Promise.all([
+    const [repos, events, comparisonContributions] = await Promise.all([
         fetchRepos(login, token, isSelf),
         safe(() => fetchEvents(login, token), [] as RawEvent[], notes, "Recent event feed"),
+        comparisonRequest,
     ]);
 
     const [languages, counts] = await Promise.all([

@@ -4,6 +4,7 @@ import type { CalendarData, RewindData } from "@/lib/rewind-types";
 import { Chip, Panel, PanelHeader } from "./primitives";
 
 const nf = (value: number) => value.toLocaleString("en-US");
+const MIN_BASE_FOR_PERCENT = 10;
 
 function activeDays(calendar: CalendarData) {
     return calendar.days.filter((day) => day.count > 0).length;
@@ -21,15 +22,19 @@ function ComparisonRow({
     current: number;
 }) {
     const delta = current - previous;
-    const percent = previous > 0 ? Math.round((delta / previous) * 100) : null;
+    // A percentage on a tiny baseline misleads (2 -> 6 is "+200%"), so show it from 10 up only.
+    const percent = previous >= MIN_BASE_FOR_PERCENT ? Math.round((delta / previous) * 100) : null;
     const TrendIcon = delta > 0 ? ArrowUp : delta < 0 ? ArrowDown : ArrowRight;
     const tone = delta > 0 ? "success" : delta < 0 ? "attention" : "default";
+    const sign = delta > 0 ? "+" : "";
     const change =
-        percent === null
-            ? delta > 0
+        delta === 0
+            ? "No change"
+            : percent !== null
+              ? `${sign}${nf(delta)} · ${sign}${percent}%`
+              : previous === 0
                 ? `+${nf(delta)} · new`
-                : "No change"
-            : `${delta > 0 ? "+" : ""}${nf(delta)} · ${percent > 0 ? "+" : ""}${percent}%`;
+                : `${sign}${nf(delta)}`;
 
     return (
         <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-lg bg-(--elevated)/60 px-3 py-2.5">
@@ -130,6 +135,7 @@ export function YearComparison({ data }: { data: RewindData }) {
                 {data.year === new Date().getUTCFullYear()
                     ? `Comparing year to date through today with the same dates in ${data.comparison.year}.`
                     : `Comparing full calendar years ${data.comparison.year} and ${data.year}.`}
+                {" Percentages appear only when the earlier number is at least 10."}
             </p>
         </Panel>
     );
