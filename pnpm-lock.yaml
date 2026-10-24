@@ -36,7 +36,7 @@ importers:
         specifier: ^1.53.0
         version: 1.60.0(@types/react@19.3.0)(react@19.3.1)
       next:
-        specifier: 16.3.8
+        specifier: ^16.3.8
         version: 16.3.8(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       next-themes:
         specifier: ^0.4.6
