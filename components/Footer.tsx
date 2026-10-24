@@ -27,7 +27,6 @@ export function Footer() {
                     className={"w-6 h-6"}
                 />
             </Link>
-
-        </footer >
+        </footer>
     );
 }

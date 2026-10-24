@@ -1,4 +1,3 @@
-
 /**
  * FETCH LAYER ONLY. This file runs on the server (shared token) or in the browser (user's token)
  * and does the minimum: call GitHub, trim each response to the fields we need, return it.
@@ -54,7 +53,10 @@ async function ghGraphql<T = Json>(
 ): Promise<T> {
     const res = await fetch(`${API}/graphql`, {
         method: "POST",
-        headers: { ...(headers(token) as Record<string, string>), "Content-Type": "application/json" },
+        headers: {
+            ...(headers(token) as Record<string, string>),
+            "Content-Type": "application/json",
+        },
         body: JSON.stringify({ query, variables }),
     });
     if (res.status === 401) throw new Error("The provided GitHub token is invalid or expired.");
@@ -144,12 +146,15 @@ async function fetchLanguages(
         .slice(0, 20);
 
     const results = await Promise.allSettled(
-        targets.map((r) => ghREST<Record<string, number>>(`/repos/${r.full_name}/languages`, token)),
+        targets.map((r) =>
+            ghREST<Record<string, number>>(`/repos/${r.full_name}/languages`, token),
+        ),
     );
     const out: RawRepoLanguages[] = [];
     let failures = 0;
     results.forEach((result, i) => {
-        if (result.status === "fulfilled") out.push({ fullName: targets[i]!.full_name, bytes: result.value });
+        if (result.status === "fulfilled")
+            out.push({ fullName: targets[i]!.full_name, bytes: result.value });
         else failures++;
     });
     if (failures) notes.push(`Language details unavailable for ${failures} repositories.`);
@@ -159,7 +164,10 @@ async function fetchLanguages(
 async function fetchEvents(login: string, token: string | undefined) {
     const events: RawEvent[] = [];
     for (let page = 1; page <= 3; page++) {
-        const chunk = await ghREST<Json[]>(`/users/${login}/events?per_page=100&page=${page}`, token);
+        const chunk = await ghREST<Json[]>(
+            `/users/${login}/events?per_page=100&page=${page}`,
+            token,
+        );
         for (const e of chunk) {
             events.push({
                 type: e.type,
@@ -223,12 +231,12 @@ async function fetchCounts(
 
     const [prs, prsMerged, issues, reviews, commitSearch] = await Promise.all([
         skip ??
-        safe<number | null>(
-            () => searchIssues(`author:${login} type:pr created:${from}..${to}`, token),
-            0,
-            notes,
-            "PR count",
-        ),
+            safe<number | null>(
+                () => searchIssues(`author:${login} type:pr created:${from}..${to}`, token),
+                0,
+                notes,
+                "PR count",
+            ),
         safe(
             () => searchIssues(`author:${login} type:pr is:merged created:${from}..${to}`, token),
             0,
@@ -236,19 +244,19 @@ async function fetchCounts(
             "Merged PR count",
         ),
         skip ??
-        safe<number | null>(
-            () => searchIssues(`author:${login} type:issue created:${from}..${to}`, token),
-            0,
-            notes,
-            "Issue count",
-        ),
+            safe<number | null>(
+                () => searchIssues(`author:${login} type:issue created:${from}..${to}`, token),
+                0,
+                notes,
+                "Issue count",
+            ),
         skip ??
-        safe<number | null>(
-            () => searchIssues(`reviewed-by:${login} type:pr updated:${from}..${to}`, token),
-            0,
-            notes,
-            "Review count",
-        ),
+            safe<number | null>(
+                () => searchIssues(`reviewed-by:${login} type:pr updated:${from}..${to}`, token),
+                0,
+                notes,
+                "Review count",
+            ),
         safe(
             () =>
                 totalCount(
@@ -276,7 +284,12 @@ export async function fetchRewindRaw(
     const login = user.login;
 
     const contributions = token
-        ? await safe(() => fetchContributions(login, year, token), null, notes, "Contribution calendar")
+        ? await safe(
+              () => fetchContributions(login, year, token),
+              null,
+              notes,
+              "Contribution calendar",
+          )
         : null;
     const isSelf = Boolean(
         contributions?.viewerLogin &&

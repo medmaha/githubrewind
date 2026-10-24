@@ -124,8 +124,7 @@ export function buildChapters(data: RewindData): Chapter[] {
                 id: "quiet",
                 title: "The quiet stretch",
                 headline: `For ${plural(bestLen, "week")} (${fmtSpan(a.start, b.end)}) no contributions were recorded.`,
-                detail:
-                    "Work outside GitHub, or in private repositories you haven't chosen to show, doesn't appear in this calendar.",
+                detail: "Work outside GitHub, or in private repositories you haven't chosen to show, doesn't appear in this calendar.",
                 stat: { value: `${bestLen}w`, label: "longest quiet stretch" },
                 range: span(a, b),
                 evidence: [evidence(a, b)],

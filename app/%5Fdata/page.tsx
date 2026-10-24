@@ -39,8 +39,8 @@ export default function StoredDataPage() {
         storedBytes === null
             ? null
             : storedBytes < 1024
-                ? `${storedBytes} bytes`
-                : `${(storedBytes / 1024).toFixed(2)} KB (${(storedBytes / (1024 * 1024)).toFixed(3)} MB)`;
+              ? `${storedBytes} bytes`
+              : `${(storedBytes / 1024).toFixed(2)} KB (${(storedBytes / (1024 * 1024)).toFixed(3)} MB)`;
 
     async function clearSavedData() {
         if (!hasSavedData || clearing) return;
@@ -136,7 +136,8 @@ export default function StoredDataPage() {
                                 <div className="rounded-md border border-border bg-elevated p-3">
                                     <dt className="text-xs text-muted-foreground">Tokens</dt>
                                     <dd className="mt-1 text-sm">
-                                        Used temporarily in memory; never saved or sent to the server.
+                                        Used temporarily in memory; never saved or sent to the
+                                        server.
                                     </dd>
                                 </div>
                             </dl>

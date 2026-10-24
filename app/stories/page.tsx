@@ -17,8 +17,8 @@ export default function StoriesPage() {
                         </p>
                         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Stories</h1>
                         <p className="mt-2 text-sm text-muted-foreground">
-                            Chapters are computed from your contribution calendar, with GitHub
-                            links so you can verify the moments behind them.
+                            Chapters are computed from your contribution calendar, with GitHub links
+                            so you can verify the moments behind them.
                         </p>
                     </header>
                     <StoryView data={data} />

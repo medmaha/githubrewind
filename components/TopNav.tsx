@@ -50,10 +50,11 @@ export default function TopNav() {
                                         key={href}
                                         href={href}
                                         aria-current={active ? "page" : undefined}
-                                        className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${active
-                                            ? "bg-primary/10 text-primary"
-                                            : "text-muted-foreground hover:bg-elevated hover:text-foreground"
-                                            }`}
+                                        className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
+                                            active
+                                                ? "bg-primary/10 text-primary"
+                                                : "text-muted-foreground hover:bg-elevated hover:text-foreground"
+                                        }`}
                                     >
                                         {label}
                                     </Link>

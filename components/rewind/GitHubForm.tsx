@@ -164,8 +164,8 @@ export default function GitHubForm() {
                     {showToken
                         ? "Hide token"
                         : hasOwnToken
-                            ? "Reveal token"
-                            : "Add your token for better analytics"}
+                          ? "Reveal token"
+                          : "Add your token for better analytics"}
                 </GhButton>
                 <Chip tone={hasOwnToken ? "success" : "primary"}>
                     {hasOwnToken ? "your token" : "shared token"}
@@ -188,8 +188,8 @@ export default function GitHubForm() {
                         <Info className="mt-0.5 size-3.5 shrink-0 text-primary" />
                         <span>
                             Runs use our shared token by default (2 requests per 5 minutes, public
-                            data only). A fine-grained token of your own removes that cap, gives
-                            you GitHub&apos;s higher rate limit (5,000 requests/hour), and includes
+                            data only). A fine-grained token of your own removes that cap, gives you
+                            GitHub&apos;s higher rate limit (5,000 requests/hour), and includes
                             activity from private repositories you own.{" "}
                             <a
                                 href={NEW_FINE_GRAINED_TOKEN}

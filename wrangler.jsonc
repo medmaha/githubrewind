@@ -3,27 +3,24 @@
     "name": "githubrewind",
     "main": "vinext/server/fetch-handler",
     "compatibility_date": "2026-10-13",
-    "compatibility_flags": [
-        "nodejs_compat",
-        "nodejs_compat_populate_process_env"
-    ],
+    "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
     // "build": {
     //     "command": "pnpm build:vinext",
     //     "cwd": "."
     // },
     "assets": {
-        "binding": "ASSETS"
+        "binding": "ASSETS",
     },
     "images": {
-        "binding": "IMAGES"
+        "binding": "IMAGES",
     },
     "secrets": {
         "required": [
             //
             "ARCJET_KEY",
             "GEMINI_API_KEY",
-            "INTERNAL_GITHUB_API_TOKEN"
-        ]
+            "INTERNAL_GITHUB_API_TOKEN",
+        ],
     },
     "workers_dev": true,
     "observability": {
@@ -31,11 +28,11 @@
         "logs": {
             "enabled": true,
             "head_sampling_rate": 1,
-            "invocation_logs": true
+            "invocation_logs": true,
         },
         "traces": {
             "enabled": true,
-            "head_sampling_rate": 1
-        }
-    }
+            "head_sampling_rate": 1,
+        },
+    },
 }

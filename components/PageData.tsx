@@ -1,11 +1,18 @@
-"use client"
+"use client";
 import { useRewindStore } from "@/store/rewind-store";
-import { AchievementsWidget, ActivityWidget, LanguagesWidget, ProfileWidget, ReposWidget, StatsGrid } from "./rewind/StatsWidgets";
+import {
+    AchievementsWidget,
+    ActivityWidget,
+    LanguagesWidget,
+    ProfileWidget,
+    ReposWidget,
+    StatsGrid,
+} from "./rewind/StatsWidgets";
 import { Panel } from "./rewind/primitives";
 
 export default function PageData() {
     const data = useRewindStore((state) => state.data);
-    if (!data) return null
+    if (!data) return null;
 
     return (
         <div className="space-y-4">
@@ -30,5 +37,5 @@ export default function PageData() {
                 </Panel>
             ) : null}
         </div>
-    )
+    );
 }

@@ -1,4 +1,10 @@
-import type { RawContributions, RawEvent, RawRepo, RawRepoLanguages, RawRewind } from "./rewind-raw";
+import type {
+    RawContributions,
+    RawEvent,
+    RawRepo,
+    RawRepoLanguages,
+    RawRewind,
+} from "./rewind-raw";
 import type {
     Achievement,
     CalendarData,
@@ -97,8 +103,7 @@ function normalizeCalendar(cc: RawContributions, year: number): CalendarData {
 }
 
 /** Monday = 0 ... Sunday = 6, for a YYYY-MM-DD date. */
-export const mondayIndex = (date: string) =>
-    (new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7;
+export const mondayIndex = (date: string) => (new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7;
 
 /**
  * Groups consecutive calendar days into weeks, Monday to Sunday. The first and last week of the
@@ -202,7 +207,12 @@ function buildAchievements(data: Omit<RewindData, "achievements">): Achievement[
         a.push({ id, title, description, tier });
 
     if (t.stars >= 1000)
-        push("star-legend", "Star Legend", `${t.stars.toLocaleString()} stars across your work`, "gold");
+        push(
+            "star-legend",
+            "Star Legend",
+            `${t.stars.toLocaleString()} stars across your work`,
+            "gold",
+        );
     else if (t.stars >= 100)
         push("star-collector", "Star Collector", `${t.stars} stars earned`, "silver");
     else if (t.stars > 0) push("first-stars", "First Light", `${t.stars} stars earned`, "bronze");
@@ -225,9 +235,19 @@ function buildAchievements(data: Omit<RewindData, "achievements">): Achievement[
         push("momentum", "Momentum", `${t.longestStreak}-day activity streak`, "silver");
 
     if (t.reposCreatedThisYear >= 15)
-        push("builder", "Serial Builder", `${t.reposCreatedThisYear} new repositories in ${data.year}`, "gold");
+        push(
+            "builder",
+            "Serial Builder",
+            `${t.reposCreatedThisYear} new repositories in ${data.year}`,
+            "gold",
+        );
     else if (t.reposCreatedThisYear > 2)
-        push("starter", "Fresh Starts", `${t.reposCreatedThisYear} new repositories in ${data.year}`, "bronze");
+        push(
+            "starter",
+            "Fresh Starts",
+            `${t.reposCreatedThisYear} new repositories in ${data.year}`,
+            "bronze",
+        );
 
     if (t.issues >= 50) push("triage", "Issue Triager", `${t.issues} issues opened`, "silver");
     if (t.reviews >= 20)
@@ -235,7 +255,12 @@ function buildAchievements(data: Omit<RewindData, "achievements">): Achievement[
     if (data.profile.followers >= 100)
         push("community", "Community Magnet", `${data.profile.followers} followers`, "silver");
     if (t.commitsThisYear >= 1000)
-        push("commit-machine", "Commit Machine", `${t.commitsThisYear} commits in ${data.year}`, "gold");
+        push(
+            "commit-machine",
+            "Commit Machine",
+            `${t.commitsThisYear} commits in ${data.year}`,
+            "gold",
+        );
 
     return a.slice(0, 8);
 }

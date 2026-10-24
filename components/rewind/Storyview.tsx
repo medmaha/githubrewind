@@ -29,7 +29,10 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 function WeekRibbon({ calendar, chapter }: { calendar: CalendarData; chapter: Chapter }) {
     const { weeks, bars, months } = useMemo(() => {
         const weeks = toWeeks(calendar.days);
-        const nonZero = weeks.map((w) => w.total).filter((t) => t > 0).sort((a, b) => a - b);
+        const nonZero = weeks
+            .map((w) => w.total)
+            .filter((t) => t > 0)
+            .sort((a, b) => a - b);
         const q = (p: number) =>
             nonZero[Math.min(nonZero.length - 1, Math.floor(nonZero.length * p))] ?? 0;
         const [q1, q2, q3] = [q(0.25), q(0.5), q(0.75)];
@@ -160,7 +163,11 @@ export function StoryView({ data }: { data: RewindData }) {
                 title={`Your ${data.year}, in chapters`}
                 hint="Every line below is computed from your contribution calendar, with links to check it on GitHub."
             />
-            <Accordion defaultValue={[chapters?.[0].id || "opening"]} type="multiple" className="space-y-3">
+            <Accordion
+                defaultValue={[chapters?.[0].id || "opening"]}
+                type="multiple"
+                className="space-y-3"
+            >
                 {chapters.map((c, i) => (
                     <AccordionItem
                         key={c.id}

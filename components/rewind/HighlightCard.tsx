@@ -72,13 +72,7 @@ async function loadAvatar(url: string): Promise<HTMLImageElement | null> {
     });
 }
 
-export function HighlightCard({
-    data,
-    insights,
-}: {
-    data: RewindData;
-    insights: AiInsights;
-}) {
+export function HighlightCard({ data, insights }: { data: RewindData; insights: AiInsights }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [rendering, setRendering] = useState(true);
 

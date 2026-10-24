@@ -17,9 +17,7 @@ export default function InsightsPage() {
                         <p className="font-mono text-xs uppercase tracking-widest text-primary">
                             AI narrative &amp; share
                         </p>
-                        <h1 className="mt-1 text-3xl font-semibold tracking-tight">
-                            Insights
-                        </h1>
+                        <h1 className="mt-1 text-3xl font-semibold tracking-tight">Insights</h1>
                         <p className="mt-2 text-sm text-muted-foreground">
                             Generate an AI year-in-review from your fetched data, then create and
                             share a highlight card.

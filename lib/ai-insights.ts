@@ -18,7 +18,7 @@ Return STRICT JSON only, matching:
   "shareCaption": string (max 260 chars, LinkedIn-ready, first person, 1-2 emojis max)
 }`;
 
-const apiKey = process.env.GEMINI_API_KEY
+const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
 export async function generateInsights(summary: InsightsSummary): Promise<AiInsights> {
@@ -71,8 +71,7 @@ export async function generateInsights(summary: InsightsSummary): Promise<AiInsi
         if (response instanceof Error && status === undefined) throw response;
 
         console.error(`AI gateway failed [${status ?? "unknown"}]`);
-        if (status === 429)
-            throw new Error("AI is busy right now. Please retry in a moment.");
+        if (status === 429) throw new Error("AI is busy right now. Please retry in a moment.");
         if (status === 402) throw new Error("AI credits exhausted for this workspace.");
         throw new Error(`AI request failed (${status ?? "unknown"}).`);
     }

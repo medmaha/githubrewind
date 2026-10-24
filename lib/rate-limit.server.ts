@@ -35,7 +35,6 @@ const rateLimiters = {
 };
 
 export async function enforceInsightsRateLimit() {
-
     const req = await request();
     const decision = await rateLimiters.insights.protect(req);
     if (decision.isDenied()) {
@@ -50,7 +49,8 @@ export async function enforceInsightsRateLimit() {
                 });
                 const diffMs = Math.max(resetAt.getTime() - Date.now(), 0);
                 const minutes = Math.ceil(diffMs / 60000);
-                const timeText = minutes > 0 ? `${minutes} minute${minutes === 1 ? "" : "s"}` : "a moment";
+                const timeText =
+                    minutes > 0 ? `${minutes} minute${minutes === 1 ? "" : "s"}` : "a moment";
 
                 msg = `You've hit the rate limit. Please try again in ${timeText} (at ${resetTime}).`;
             }
@@ -63,7 +63,6 @@ export async function enforceInsightsRateLimit() {
 }
 
 export async function enforceSharedTokenRateLimit(): Promise<InternalLimitResult> {
-
     const req = await request();
     const decision = await rateLimiters.api.protect(req);
     if (!decision.isDenied()) return { ok: true };

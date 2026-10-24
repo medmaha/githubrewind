@@ -34,11 +34,7 @@ export const PLATFORMS: Record<
 
 const nf = (n: number) => n.toLocaleString("en-US");
 
-export function buildShareText(
-    data: RewindData,
-    insights: AiInsights,
-    platform: Platform,
-): string {
+export function buildShareText(data: RewindData, insights: AiInsights, platform: Platform): string {
     const t = data.totals;
     const name = data.profile.name ?? data.profile.login;
     const langs = data.languages.slice(0, 3).map((l) => l.name);
@@ -72,7 +68,10 @@ export function buildShareText(
         ...(langs.length ? [`• Top languages: ${langs.join(", ")}`] : []),
         "",
         insights.significantAchievements.length
-            ? `🏆 Highlights\n${insights.significantAchievements.slice(0, 3).map((a) => `• ${a}`).join("\n")}`
+            ? `🏆 Highlights\n${insights.significantAchievements
+                  .slice(0, 3)
+                  .map((a) => `• ${a}`)
+                  .join("\n")}`
             : "",
         "",
         insights.shareCaption,

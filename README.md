@@ -17,12 +17,12 @@ It is a personal project, not an official GitHub product. It is released under t
 
 After you run a rewind, the navigation links take you to:
 
-| Page | What you will find |
-| --- | --- |
-| `/rewind` | Profile, activity totals, repositories, languages, and achievements |
-| `/stories` | Chapters computed from the contribution calendar, with links back to GitHub |
-| `/insights` | Optional AI recap, downloadable highlight card, and share captions |
-| `/_data` | A view of the saved browser record and a control to clear it |
+| Page        | What you will find                                                          |
+| ----------- | --------------------------------------------------------------------------- |
+| `/rewind`   | Profile, activity totals, repositories, languages, and achievements         |
+| `/stories`  | Chapters computed from the contribution calendar, with links back to GitHub |
+| `/insights` | Optional AI recap, downloadable highlight card, and share captions          |
+| `/_data`    | A view of the saved browser record and a control to clear it                |
 
 ## Run it locally
 
@@ -82,13 +82,13 @@ Next.js, React, TypeScript, Tailwind CSS, Zustand, GitHub REST and GraphQL APIs,
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Run the local development server |
-| `pnpm build` | Create a production build |
-| `pnpm start` | Serve a production build |
-| `pnpm format` | Format the project with Prettier |
-| `pnpm format:check` | Check formatting with Prettier |
+| Command             | Purpose                          |
+| ------------------- | -------------------------------- |
+| `pnpm dev`          | Run the local development server |
+| `pnpm build`        | Create a production build        |
+| `pnpm start`        | Serve a production build         |
+| `pnpm format`       | Format the project with Prettier |
+| `pnpm format:check` | Check formatting with Prettier   |
 
 ## A note from me
 

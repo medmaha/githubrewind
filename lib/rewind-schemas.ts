@@ -1,13 +1,16 @@
 import { z } from "zod";
 
-const minYear = 2010
+const minYear = 2010;
 
-const yearSchema = z.coerce.number().int().min(minYear).refine((value) => {
-    const year = Number(value);
-    const currentYear = new Date().getUTCFullYear();
-    return !Number.isNaN(year) && year <= (currentYear + 1);
-}, `Year must be between ${minYear} and the current year`);
-
+const yearSchema = z.coerce
+    .number()
+    .int()
+    .min(minYear)
+    .refine((value) => {
+        const year = Number(value);
+        const currentYear = new Date().getUTCFullYear();
+        return !Number.isNaN(year) && year <= currentYear + 1;
+    }, `Year must be between ${minYear} and the current year`);
 
 export const rewindInputSchema = z.object({
     username: z
