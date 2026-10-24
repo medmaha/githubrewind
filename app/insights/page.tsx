@@ -19,17 +19,17 @@ export default function InsightsPage() {
                         </p>
                         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Insights</h1>
                         <p className="mt-2 text-sm text-muted-foreground">
-                            Generate an AI year-in-review from your fetched data, then create and
-                            share a highlight card.
+                            Get a concise read on your activity, with evidence behind each
+                            highlight. Review the narrative before sharing it.
                         </p>
                     </header>
-                    <InsightsPanel data={data} />
-                    {insights ? (
-                        <>
-                            <HighlightCard data={data} insights={insights} />
-                            <SharePanel data={data} insights={insights} />
-                        </>
-                    ) : null}
+                    <InsightsPanel
+                        data={data}
+                        HighlightCard={
+                            <>{insights && <HighlightCard data={data} insights={insights} />}</>
+                        }
+                    />
+                    {insights && <SharePanel data={data} insights={insights} />}
                 </main>
             ) : null}
         </RequireRewind>

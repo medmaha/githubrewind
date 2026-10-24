@@ -1,4 +1,5 @@
-import { Brain, Loader2, Sparkles, TrendingUp, Trophy, Wand2 } from "lucide-react";
+import { ReactNode } from "react";
+import { Brain, Loader2, Sparkles, TrendingUp, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 import { Panel, PanelHeader, Chip, GhButton } from "./primitives";
@@ -29,7 +30,13 @@ function toSummary(data: RewindData): InsightsSummary {
     };
 }
 
-export function InsightsPanel({ data }: { data: RewindData }) {
+export function InsightsPanel({
+    data,
+    HighlightCard,
+}: {
+    data: RewindData;
+    HighlightCard: ReactNode;
+}) {
     const {
         insights,
         insightsStatus,
@@ -109,6 +116,8 @@ export function InsightsPanel({ data }: { data: RewindData }) {
                     {insights.yearlyOverview}
                 </p>
             </Panel>
+
+            {HighlightCard}
 
             <Panel>
                 <PanelHeader
