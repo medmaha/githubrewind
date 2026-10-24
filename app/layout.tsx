@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html lang="en" className="scroll-smooth">
             <body>
                 <SiteShell>{children}</SiteShell>
-                <Toaster />
+                <Toaster richColors closeButton position="top-right" />
             </body>
         </html>
     );
