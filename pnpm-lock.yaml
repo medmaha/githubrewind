@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@arcjet/next':
-        specifier: 1.10.0
-        version: 1.10.0(next@16.3.8(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
       '@radix-ui/react-accordion':
         specifier: ^1.2.20
         version: 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -124,71 +121,6 @@ packages:
     resolution: {integrity: sha512-U4+70Pc5ZS9osnCBCE5Jha/ciHM+Yp+CNMNC/7HvYbNRk1Ldd+f7qO65W5qfhu/TCv+/ozljlXXe9Nj8419DMA==}
     engines: {node: '>=10'}
 
-  '@arcjet/analyze-wasm@1.10.0':
-    resolution: {integrity: sha512-vZqDQyRoeuxQcOlF75+0Xu2mlCCRl83HLFmpTDGLp3KGDYI1bRLBXtYOqqE5PK6LGQtJtYkDfJCWPHIngLTDYw==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/analyze@1.10.0':
-    resolution: {integrity: sha512-iWzLCb28Q/fcEiKGk6kN09YFx+PUoKCqwq5krC3niWSFHEuH5p/SAAPTdkN4+uMQkunszuqCCKLpfshGx0vXAg==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/body@1.10.0':
-    resolution: {integrity: sha512-cW59ijiZvjl8tDfyAuAfPCYjWwhafU0UEkYb4pQ51KJUYzvEc5ytxWGxYSh/V4agATcBLLqboOpyN705ROVOyw==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/cache@1.10.0':
-    resolution: {integrity: sha512-HWZHkm2JPKa6NjKygwFM0tg5EdnYFGNlEV6D0P/UIaTApuS1U5LrNj9mp1sWDpt01C8/WWmY8crQGEA3LRuNng==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/duration@1.10.0':
-    resolution: {integrity: sha512-CMfP5jDKx1GN0y+CU9HhMHy6UIX9wVqVdPVtZMYFrQDKWIyLaUpWkW+AKEOPPV6TTtapxnt+/XAZYpHxQ43FsA==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/env@1.10.0':
-    resolution: {integrity: sha512-8Woh0lZUIC13iXjovtcqpEAttaJb8bYicSpjC2ba47ePacbXgZKznuboJwwGb6a8kBu1v5/nCE2JugrwsiUd2g==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/headers@1.10.0':
-    resolution: {integrity: sha512-MPwP1lO+iMJNca0D1fWxdW/4sj/5hZ8D7YKpJ6JN4W6joiW45+bFhJBnJnVRjIsl/alsIKdZMIBVUlcv0vEZaQ==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/ip@1.10.0':
-    resolution: {integrity: sha512-bYo8/CwbMbzMC2x4LAu+C9V2qi+XOzojUCzvzDp8XASGXGGyjRI7vJ7bZx4dMR99xF5iv74x4Ksi0N3Pjr5ZVg==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/logger@1.10.0':
-    resolution: {integrity: sha512-antsrgRzzR+asMuV/sAdndIi0rkkpUaUTe8n8JAG4ZrDRa54YNPQO0skRjipjT/g0nJmTA9auVL/CnhmrHRHug==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/next@1.10.0':
-    resolution: {integrity: sha512-7o2R3jEvHLt1C+8viC+VqGtw4Jjr/Th1BT3NXGyLST/dx2xZx+hfu+qYltsdO2R3A+hDiGoT8TUnQeqwDcRIQQ==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-    peerDependencies:
-      next: '>=13'
-
-  '@arcjet/protocol@1.10.0':
-    resolution: {integrity: sha512-qDsEzlDixqM9X0GuvgBosEhCwsGMbHgvlvmEtYhWy9d3JKVsqWoCz+/BP7JwDlHZXjrkqwTyAZZKkHX7OmqS8g==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/runtime@1.10.0':
-    resolution: {integrity: sha512-78BC1xmD+Nj4esfIdSR3q2IlcKqrT+EteXTlYlgXfrJlU6wa1tvMHaafi10/WY3sGg7KYJGeO6QL5Obwd/2OPQ==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/sprintf@1.10.0':
-    resolution: {integrity: sha512-849scMn5QcUjfp2bcKbkeVevGartwDupQsqPJsFbFqAPjhBTts5ubnFShh4n1cw80YsznzlRTJbN8QV4KKmZlw==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/stable-hash@1.10.0':
-    resolution: {integrity: sha512-sx4B4g/EEhDGf0GbP05aA45LGhPkG6xwbYBJGqY5FZRdN1tDsPg748qfCRwne7ptwfwMP9u92R9TliofH29MxA==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@arcjet/transport@1.10.0':
-    resolution: {integrity: sha512-tcmnrqOVzq4MfB1V2Rz85BXa8wY9VONStise6TjeGvRwRMtXnKY9sWhUEsayJYQ6KKJQcmxAkMcODUQKGts1sw==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
-  '@bufbuild/protobuf@2.12.1':
-    resolution: {integrity: sha512-BvAMfS6LrgZiryOAZ4pBYucu4wG/Ei/9o9DZ9akbREnMLbPJiom2i8b9C8IsKErQoiKqVhrerzt3kOT/RrzLHg==}
-
   '@cloudflare/build-output-utils@0.9.0':
     resolution: {integrity: sha512-2FMA4XnVj5u7LYJE9j3uSJ+cU4Zn994WiyEOVhbMV7wh7pcwi1rIYafH6kiWaa+Y3Bjvf0ow7JgoDaO05qYVPg==}
 
@@ -285,24 +217,6 @@ packages:
   '@cloudflare/workers-response-store@1.1.2':
     resolution: {integrity: sha512-GovykTJu5ZSBxvuzjDZbf48h3ChsDulcVywv9vXmTXcFnfdMXl5VyALBXDFKB+yIVqfWixm2VCNv8fPo6KcVcQ==}
     engines: {node: '>=22'}
-
-  '@connectrpc/connect-node@2.1.2':
-    resolution: {integrity: sha512-+i/aAOpsI8sIx1mbYp6d99zvxaUSF6t/jP9Ux9maAmjsZPgmIQ3JuIeYi0zJIP9zlCnBlJjkpPosshCgdRuThQ==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      '@bufbuild/protobuf': ^2.7.0
-      '@connectrpc/connect': 2.1.2
-
-  '@connectrpc/connect-web@2.1.2':
-    resolution: {integrity: sha512-1tfaK85MU+gJjwwmL31d2rzdf0XCYX99chZf63uG89SGBUd4XuZ4ZzhGo2u79TPXOE6nLIZQ2okrpyey42PYdg==}
-    peerDependencies:
-      '@bufbuild/protobuf': ^2.7.0
-      '@connectrpc/connect': 2.1.2
-
-  '@connectrpc/connect@2.1.2':
-    resolution: {integrity: sha512-MXkBijtcX09R10Eb6sFeIetc6w6746eio6xtfuyVOH7oQAacT1X0GzMIQFux6Qy8cq3W/T5qX5Bei8YbFtmRGA==}
-    peerDependencies:
-      '@bufbuild/protobuf': ^2.7.0
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -1624,10 +1538,6 @@ packages:
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
 
-  arcjet@1.10.0:
-    resolution: {integrity: sha512-4aY2sgSFdoEC/T72TaV4Aj5M0f/hYAPLSpIi1QXGvtLynKuyZyEjjO2H7qZDi+L28/4s2u6iUoBTyoXLeh5e3w==}
-    engines: {node: '>=22.21.0 <23 || >=24.5.0'}
-
   autoprefixer@10.6.1:
     resolution: {integrity: sha512-cL1Qz6ADZhcEbny/8HPfe99J6HhNoYtpX2LFLIbhgGE7Q1hlQVkYFdetDN7Id3KiQxhDrHwzlHr/YQCnZ8+xSA==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2553,64 +2463,6 @@ snapshots:
 
   '@alloc/quick-lru@5.3.0': {}
 
-  '@arcjet/analyze-wasm@1.10.0': {}
-
-  '@arcjet/analyze@1.10.0':
-    dependencies:
-      '@arcjet/analyze-wasm': 1.10.0
-      '@arcjet/protocol': 1.10.0
-
-  '@arcjet/body@1.10.0': {}
-
-  '@arcjet/cache@1.10.0': {}
-
-  '@arcjet/duration@1.10.0': {}
-
-  '@arcjet/env@1.10.0': {}
-
-  '@arcjet/headers@1.10.0': {}
-
-  '@arcjet/ip@1.10.0': {}
-
-  '@arcjet/logger@1.10.0':
-    dependencies:
-      '@arcjet/sprintf': 1.10.0
-
-  '@arcjet/next@1.10.0(next@16.3.8(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))':
-    dependencies:
-      '@arcjet/body': 1.10.0
-      '@arcjet/env': 1.10.0
-      '@arcjet/headers': 1.10.0
-      '@arcjet/ip': 1.10.0
-      '@arcjet/logger': 1.10.0
-      '@arcjet/protocol': 1.10.0
-      '@arcjet/transport': 1.10.0
-      arcjet: 1.10.0
-      next: 16.3.8(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-
-  '@arcjet/protocol@1.10.0':
-    dependencies:
-      '@arcjet/cache': 1.10.0
-      '@bufbuild/protobuf': 2.12.1
-      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.1)
-
-  '@arcjet/runtime@1.10.0': {}
-
-  '@arcjet/sprintf@1.10.0': {}
-
-  '@arcjet/stable-hash@1.10.0': {}
-
-  '@arcjet/transport@1.10.0':
-    dependencies:
-      '@arcjet/env': 1.10.0
-      '@arcjet/logger': 1.10.0
-      '@bufbuild/protobuf': 2.12.1
-      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.1)
-      '@connectrpc/connect-node': 2.1.2(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1))
-      '@connectrpc/connect-web': 2.1.2(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1))
-
-  '@bufbuild/protobuf@2.12.1': {}
-
   '@cloudflare/build-output-utils@0.9.0':
     dependencies:
       '@cloudflare/config': 0.24.1
@@ -2689,20 +2541,6 @@ snapshots:
     optional: true
 
   '@cloudflare/workers-response-store@1.1.2': {}
-
-  '@connectrpc/connect-node@2.1.2(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1))':
-    dependencies:
-      '@bufbuild/protobuf': 2.12.1
-      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.1)
-
-  '@connectrpc/connect-web@2.1.2(@bufbuild/protobuf@2.12.1)(@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1))':
-    dependencies:
-      '@bufbuild/protobuf': 2.12.1
-      '@connectrpc/connect': 2.1.2(@bufbuild/protobuf@2.12.1)
-
-  '@connectrpc/connect@2.1.2(@bufbuild/protobuf@2.12.1)':
-    dependencies:
-      '@bufbuild/protobuf': 2.12.1
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -3615,16 +3453,6 @@ snapshots:
       fast-uri: 3.1.9
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
-
-  arcjet@1.10.0:
-    dependencies:
-      '@arcjet/analyze': 1.10.0
-      '@arcjet/cache': 1.10.0
-      '@arcjet/duration': 1.10.0
-      '@arcjet/headers': 1.10.0
-      '@arcjet/protocol': 1.10.0
-      '@arcjet/runtime': 1.10.0
-      '@arcjet/stable-hash': 1.10.0
 
   autoprefixer@10.6.1(postcss@8.5.31):
     dependencies:

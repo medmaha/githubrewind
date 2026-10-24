@@ -40,12 +40,11 @@ pnpm install
 Create `.env.local` in the project root:
 
 ```dotenv
-# Required by the server-side Arcjet rate limiters
-ARCJET_KEY="your-arcjet-key"
-
-# Optional: lets the app make limited shared-token GitHub requests
+# Required for anonymous rewinds that use the shared server token.
 INTERNAL_GITHUB_API_TOKEN="your-read-only-github-token"
 ```
+
+Configure `INTERNAL_GITHUB_API_TOKEN` as a Cloudflare secret (or in `.env.local` for local development). Use a read-only token with the minimum access the rewind needs.
 
 Start the development server with the Cloudflare bindings used by the app:
 
@@ -75,14 +74,15 @@ GitHub does not expose every kind of activity through one API. What GithubRewind
 
 Rewind results and generated insights are stored in this browser's local storage. The saved-data page shows the record and can clear it. The GitHub token entered into the form stays in memory for the current browser session and is not persisted.
 
-When you provide your own token, GitHub requests are made from your browser. Without one, rewind requests use the server action and the optional `INTERNAL_GITHUB_API_TOKEN`. The shared-token endpoint is limited to two requests per IP every five minutes by Arcjet. AI generation is also rate limited.
+When you provide your own token, GitHub requests are made from your browser; the token is not sent to this app's server or saved to local storage. Without one, rewind requests use the configured read-only `INTERNAL_GITHUB_API_TOKEN` through `/api/rewind` and are limited per IP by Cloudflare's `REWIND_RATE_LIMITER`. The shared-token response excludes private repository details. AI generation is also rate limited per IP.
 
 For AI insights, the browser sends a bounded list of plain-language facts to `/api/insights`. The Cloudflare Workers AI route builds the model prompt on the server and applies a per-IP rate limit. The facts exclude the GitHub token, raw activity payloads, private repository names, profile bio, company, and location. Generated highlights cite the facts they use, and unsupported numbers are filtered before the response is returned.
-The AI route needs the `AI` and `INSIGHTS_RATE_LIMITER` bindings configured in `wrangler.jsonc`; the Cloudflare-compatible development command above provides the local runtime.
+Both POST APIs accept same-origin JSON requests only, reject cross-origin requests, cap request-body size, and send non-cacheable responses. They do not enable cross-origin resource sharing (CORS).
+The Cloudflare runtime needs the `AI`, `REWIND_RATE_LIMITER`, and `INSIGHTS_RATE_LIMITER` bindings configured in `wrangler.jsonc`, and the `INTERNAL_GITHUB_API_TOKEN` secret.
 
 ## Built with
 
-Next.js, React, TypeScript, Tailwind CSS, Zustand, GitHub REST and GraphQL APIs, Cloudflare Workers AI, and Arcjet.
+Next.js, React, TypeScript, Tailwind CSS, Zustand, GitHub REST and GraphQL APIs, and Cloudflare Workers AI.
 
 ## Scripts
 
