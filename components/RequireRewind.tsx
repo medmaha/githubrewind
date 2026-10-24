@@ -14,15 +14,7 @@ export function RequireRewind({ children }: { children: ReactNode }) {
         if (hydrated && !data) router.replace("/");
     }, [data, hydrated, router]);
 
-    if (!hydrated || !data) {
-        return (
-            <main className="mx-auto max-w-6xl px-4 py-12 text-sm text-muted-foreground sm:px-6">
-                {hydrated
-                    ? "Return to the home page to generate a rewind first."
-                    : "Restoring your saved rewind…"}
-            </main>
-        );
-    }
+    if (!hydrated || !data) return null;
 
     return children;
 }
