@@ -43,17 +43,14 @@ Create `.env.local` in the project root:
 # Required by the server-side Arcjet rate limiters
 ARCJET_KEY="your-arcjet-key"
 
-# Optional: enables AI year-in-review generation
-GEMINI_API_KEY="your-gemini-api-key"
-
 # Optional: lets the app make limited shared-token GitHub requests
 INTERNAL_GITHUB_API_TOKEN="your-read-only-github-token"
 ```
 
-Start the development server:
+Start the development server with the Cloudflare bindings used by the app:
 
 ```bash
-pnpm dev
+pnpm dev:vinext
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
@@ -80,11 +77,12 @@ Rewind results and generated insights are stored in this browser's local storage
 
 When you provide your own token, GitHub requests are made from your browser. Without one, rewind requests use the server action and the optional `INTERNAL_GITHUB_API_TOKEN`. The shared-token endpoint is limited to two requests per IP every five minutes by Arcjet. AI generation is also rate limited.
 
-For AI insights, the app sends a compact summary of the rewind to Gemini from the server. The summary includes the username, counts, language percentages, top repository names, and topics; it does not include the GitHub token or raw event payloads.
+For AI insights, the browser sends a bounded list of plain-language facts to `/api/insights`. The Cloudflare Workers AI route builds the model prompt on the server and applies a per-IP rate limit. The facts exclude the GitHub token, raw activity payloads, private repository names, profile bio, company, and location. Generated highlights cite the facts they use, and unsupported numbers are filtered before the response is returned.
+The AI route needs the `AI` and `INSIGHTS_RATE_LIMITER` bindings configured in `wrangler.jsonc`; the Cloudflare-compatible development command above provides the local runtime.
 
 ## Built with
 
-Next.js, React, TypeScript, Tailwind CSS, Zustand, GitHub REST and GraphQL APIs, Google's Generative AI SDK, and Arcjet.
+Next.js, React, TypeScript, Tailwind CSS, Zustand, GitHub REST and GraphQL APIs, Cloudflare Workers AI, and Arcjet.
 
 ## Scripts
 
