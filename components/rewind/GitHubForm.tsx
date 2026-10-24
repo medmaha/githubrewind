@@ -123,6 +123,8 @@ export default function GitHubForm() {
                         placeholder="github-username"
                         autoCapitalize="none"
                         autoCorrect="off"
+                        name="github_username"
+                        autoComplete="github_username"
                         spellCheck={false}
                         className="pl-9 font-mono"
                         aria-label="GitHub username"
