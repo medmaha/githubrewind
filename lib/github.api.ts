@@ -24,14 +24,14 @@ type Json = any;
 function headers(token?: string): HeadersInit {
     const h: Record<string, string> = {
         Accept: "application/vnd.github+json",
-        "User-Agent": "github-activity-rewind",
+        "User-Agent": "GithubRewind",
         "X-GitHub-Api-Version": "2022-11-28",
     };
     if (token) h["Authorization"] = `Bearer ${token}`;
     return h;
 }
 
-async function gh<T = Json>(path: string, token?: string): Promise<T> {
+async function ghREST<T = Json>(path: string, token?: string): Promise<T> {
     const res = await fetch(`${API}${path}`, { headers: headers(token) });
     if (!res.ok) {
         if (res.status === 404) throw new Error("GitHub user not found.");
@@ -78,7 +78,7 @@ async function safe<T>(fn: () => Promise<T>, fallback: T, notes: string[], label
 }
 
 async function totalCount(path: string, token?: string) {
-    const data = await gh<{ total_count: number }>(path, token);
+    const data = await ghREST<{ total_count: number }>(path, token);
     return data.total_count ?? 0;
 }
 
@@ -125,7 +125,7 @@ async function fetchRepos(login: string, token: string | undefined, isSelf: bool
             ? `/user/repos?affiliation=owner,collaborator,organization_member`
             : `/users/${login}/repos?type=owner`;
     for (let page = 1; page <= 3; page++) {
-        const chunk = await gh<Json[]>(`${base}&sort=updated&per_page=100&page=${page}`, token);
+        const chunk = await ghREST<Json[]>(`${base}&sort=updated&per_page=100&page=${page}`, token);
         for (const r of chunk) repos.push(pickRepo(r));
         if (chunk.length < 100) break;
     }
@@ -144,7 +144,7 @@ async function fetchLanguages(
         .slice(0, 20);
 
     const results = await Promise.allSettled(
-        targets.map((r) => gh<Record<string, number>>(`/repos/${r.full_name}/languages`, token)),
+        targets.map((r) => ghREST<Record<string, number>>(`/repos/${r.full_name}/languages`, token)),
     );
     const out: RawRepoLanguages[] = [];
     let failures = 0;
@@ -159,7 +159,7 @@ async function fetchLanguages(
 async function fetchEvents(login: string, token: string | undefined) {
     const events: RawEvent[] = [];
     for (let page = 1; page <= 3; page++) {
-        const chunk = await gh<Json[]>(`/users/${login}/events?per_page=100&page=${page}`, token);
+        const chunk = await ghREST<Json[]>(`/users/${login}/events?per_page=100&page=${page}`, token);
         for (const e of chunk) {
             events.push({
                 type: e.type,
@@ -272,7 +272,7 @@ export async function fetchRewindRaw(
 ): Promise<RawRewind> {
     const notes: string[] = [];
 
-    const user = pickUser(await gh<Json>(`/users/${username}`, token));
+    const user = pickUser(await ghREST<Json>(`/users/${username}`, token));
     const login = user.login;
 
     const contributions = token
