@@ -65,7 +65,7 @@ You can use your own fine-grained GitHub token in the form instead of configurin
 GitHub does not expose every kind of activity through one API. What GithubRewind can show depends on the selected year, the available GitHub endpoints, the token used, and GitHub contribution visibility settings.
 
 - The full-year contribution calendar needs an authenticated GitHub request. Without it, the app falls back to the public events feed, which only covers roughly the last 90 days.
-- The data coverage panel on `/rewind` labels each figure as verified, approximate, partial, estimated, or unavailable.
+- The data coverage panel on `/stories` labels each figure as verified, approximate, partial, estimated, or unavailable.
 - The developer fingerprint is rule-based, not AI. Its traits are thresholds on calendar and total numbers, and each one lists its rule.
 - Year-over-year comparisons and story chapters need the contribution calendar. When rewinding the current year, the comparison uses the same dates from the previous year rather than comparing a partial year with a full one.
 - Private contributions appear only when GitHub makes them visible in the profile contribution calendar. Private repository details are only fetched when the token belongs to the account being analyzed.

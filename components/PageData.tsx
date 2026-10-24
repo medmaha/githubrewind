@@ -9,7 +9,6 @@ import {
     StatsGrid,
 } from "./rewind/StatsWidgets";
 import { Panel } from "./rewind/primitives";
-import { CoveragePanel } from "./rewind/CoveragePanel";
 import { YearComparison } from "./rewind/YearComparison";
 
 export default function PageData() {
@@ -27,7 +26,6 @@ export default function PageData() {
                 <AchievementsWidget data={data} />
             </div>
             <YearComparison data={data} />
-            <CoveragePanel data={data} />
             {data.notes.length ? (
                 <Panel className="border-primary/50 border-2">
                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
