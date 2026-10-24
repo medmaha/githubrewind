@@ -1,6 +1,14 @@
 // @ts-ignore
 import { env } from "cloudflare:workers";
 
+import {
+    apiJson,
+    apiOptions,
+    getRateLimitKey,
+    readJsonBody,
+    rejectCrossOrigin,
+    requireJsonContentType,
+} from "@/lib/api-security";
 import { parseInsights, INSIGHT_SYSTEM_PROMPT, buildInsightPrompt } from "@/lib/insight-grounding";
 import { insightsInputSchema } from "@/lib/rewind-schemas";
 
@@ -49,77 +57,45 @@ const INSIGHTS_RESPONSE_SCHEMA = {
     ],
 } as const;
 
+export function OPTIONS(request: Request) {
+    return apiOptions(request);
+}
+
 export async function POST(request: Request) {
-    const contentLength = Number(request.headers.get("content-length"));
-    if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {
-        return Response.json({ error: "Insights request is too large." }, { status: 413 });
-    }
+    const rejectedOrigin = rejectCrossOrigin(request);
+    if (rejectedOrigin) return rejectedOrigin;
 
-    let bodyText: string;
-    try {
-        const reader = request.body?.getReader();
-        if (!reader) {
-            return Response.json({ error: "Insights request body is required." }, { status: 400 });
-        }
+    const invalidContentType = requireJsonContentType(request);
+    if (invalidContentType) return invalidContentType;
 
-        const chunks: Uint8Array[] = [];
-        let size = 0;
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            size += value.byteLength;
-            if (size > MAX_REQUEST_BYTES) {
-                await reader.cancel();
-                return Response.json({ error: "Insights request is too large." }, { status: 413 });
-            }
-            chunks.push(value);
-        }
+    const body = await readJsonBody(request, MAX_REQUEST_BYTES);
+    if (!body.ok) return body.response;
 
-        const bytes = new Uint8Array(size);
-        let offset = 0;
-        for (const chunk of chunks) {
-            bytes.set(chunk, offset);
-            offset += chunk.byteLength;
-        }
-        bodyText = new TextDecoder().decode(bytes);
-    } catch {
-        return Response.json({ error: "Could not read the insights request." }, { status: 400 });
-    }
-
-    let body: unknown;
-    try {
-        body = JSON.parse(bodyText);
-    } catch {
-        return Response.json({ error: "Invalid JSON body." }, { status: 400 });
-    }
-
-    const parsed = insightsInputSchema.safeParse(body);
+    const parsed = insightsInputSchema.safeParse(body.body);
     if (!parsed.success) {
-        return Response.json({ error: "Invalid insights data." }, { status: 400 });
+        return apiJson({ error: "Invalid insights data." }, { status: 400 });
     }
 
     const input = parsed.data;
     if (
         input.facts.some((fact, index) => fact.id !== `f${index + 1}` || /[\r\n\0]/.test(fact.text))
     ) {
-        return Response.json({ error: "Invalid insights facts." }, { status: 400 });
+        return apiJson({ error: "Invalid insights facts." }, { status: 400 });
     }
 
-    // Only Cloudflare's client IP header is trusted; forwarded headers can be spoofed.
-    const clientIp = request.headers.get("cf-connecting-ip")?.trim();
-    const rateLimitKey = clientIp && clientIp.length <= 64 ? clientIp : "unknown";
-
     try {
-        const { success } = await env.INSIGHTS_RATE_LIMITER.limit({ key: rateLimitKey });
+        const { success } = await env.INSIGHTS_RATE_LIMITER.limit({
+            key: getRateLimitKey(request),
+        });
         if (!success) {
-            return Response.json(
+            return apiJson(
                 { error: "Insights are being requested too often. Please try again shortly." },
                 { status: 429 },
             );
         }
     } catch (error) {
         console.error("Insights rate limiter failed:", error);
-        return Response.json({ error: "Insights are temporarily unavailable." }, { status: 500 });
+        return apiJson({ error: "Insights are temporarily unavailable." }, { status: 503 });
     }
 
     try {
@@ -137,12 +113,12 @@ export async function POST(request: Request) {
 
         const message = result?.choices?.[0]?.message?.content;
         if (typeof message !== "string" || !message.trim()) {
-            return Response.json(
+            return apiJson(
                 { error: "The AI did not return an insights response." },
                 { status: 502 },
             );
         }
-        return Response.json({
+        return apiJson({
             insights: parseInsights(message, input.facts, input.year, input.login),
         });
     } catch (error) {
@@ -151,6 +127,6 @@ export async function POST(request: Request) {
             error instanceof Error && error.message === "AI returned an invalid JSON response."
                 ? "The AI returned an incomplete response. Please try again."
                 : "Could not generate grounded insights. Please try again.";
-        return Response.json({ error: message }, { status: 502 });
+        return apiJson({ error: message }, { status: 502 });
     }
 }

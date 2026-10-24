@@ -118,12 +118,17 @@ const pickRepo = (r: Json): RawRepo => ({
     topics: Array.isArray(r.topics) ? r.topics : [],
 });
 
-async function fetchRepos(login: string, token: string | undefined, isSelf: boolean) {
+async function fetchRepos(
+    login: string,
+    token: string | undefined,
+    isSelf: boolean,
+    includePrivateRepos: boolean,
+) {
     const repos: RawRepo[] = [];
     // `/user/repos` lists the TOKEN OWNER's repos, so only use it when that owner is the
     // user being searched. Otherwise we'd show the token owner's repositories for any username.
     const base =
-        token && isSelf
+        token && isSelf && includePrivateRepos
             ? `/user/repos?affiliation=owner,collaborator,organization_member`
             : `/users/${login}/repos?type=owner`;
     for (let page = 1; page <= 3; page++) {
@@ -303,6 +308,7 @@ export async function fetchRewindRaw(
     username: string,
     year: number,
     token?: string,
+    options: { includePrivateRepos?: boolean } = {},
 ): Promise<RawRewind> {
     const notes: string[] = [];
 
@@ -338,9 +344,10 @@ export async function fetchRewindRaw(
         contributions?.viewerLogin &&
         contributions.viewerLogin.toLowerCase() === login.toLowerCase(),
     );
+    const includePrivateRepos = options.includePrivateRepos ?? true;
 
     const [repos, events, comparisonContributions] = await Promise.all([
-        fetchRepos(login, token, isSelf),
+        fetchRepos(login, token, isSelf, includePrivateRepos),
         safe(() => fetchEvents(login, token), [] as RawEvent[], notes, "Recent event feed"),
         comparisonRequest,
     ]);
@@ -350,18 +357,31 @@ export async function fetchRewindRaw(
         fetchCounts(login, year, token, Boolean(contributions), notes),
     ]);
 
+    const redactPrivateRepositoryDetails = (data: RawContributions | null) =>
+        data && !includePrivateRepos
+            ? {
+                  ...data,
+                  commitContributionsByRepository: data.commitContributionsByRepository.filter(
+                      (entry) => !entry.repository.isPrivate,
+                  ),
+              }
+            : data;
+
     return {
         year,
         generatedAt: new Date().toISOString(),
         authenticated: Boolean(token),
         isSelf,
+        privateReposIncluded: Boolean(token && isSelf && includePrivateRepos),
         user,
         repos,
         languages,
         events,
         counts,
-        contributions: contributions?.collection ?? null,
-        comparisonContributions: comparisonContributions?.collection ?? null,
+        contributions: redactPrivateRepositoryDetails(contributions?.collection ?? null),
+        comparisonContributions: redactPrivateRepositoryDetails(
+            comparisonContributions?.collection ?? null,
+        ),
         notes,
     };
 }

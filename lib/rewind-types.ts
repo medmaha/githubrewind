@@ -1,5 +1,3 @@
-import type { RawRewind } from "./rewind-raw";
-
 export type RewindProfile = {
     login: string;
     name: string | null;
@@ -125,19 +123,6 @@ export type AiInsights = {
     growthEvidence?: string[][];
     caveat?: string;
 };
-
-export type InternalLimitResult =
-    | { ok: true }
-    | { ok: false; reason: "rate_limit"; retryAt: number | null }
-    | { ok: false; reason: "forbidden" };
-
-/**
- * Returned (not thrown) by the server action: Next.js redacts thrown error messages in production.
- * The server only fetches: the client turns `raw` into RewindData with `computeRewind`.
- */
-export type InternalRewindResult =
-    | { ok: true; raw: RawRewind }
-    | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
 
 export type Chapter = {
     id:

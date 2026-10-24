@@ -281,7 +281,9 @@ export function computeRewind(raw: RawRewind): RewindData {
         notes.push(
             `Includes ${calendar.restrictedContributions} private contributions this user chose to show on their profile.`,
         );
-    if (raw.authenticated && !raw.isSelf)
+    if (raw.authenticated && !raw.privateReposIncluded)
+        notes.push("Private repository details are excluded from this shared rewind response.");
+    else if (raw.authenticated && !raw.isSelf)
         notes.push("Private repositories are only included when the token belongs to this user.");
     if (raw.repos.length === 0) notes.push("No repositories found for this account.");
 

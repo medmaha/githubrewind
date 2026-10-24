@@ -17,8 +17,31 @@ import { GhButton, GhInput, Chip } from "./primitives";
 import { useRewindStore } from "@/store/rewind-store";
 import { rewindInputSchema } from "@/lib/rewind-schemas";
 import { fetchRewindRaw } from "@/lib/github.api";
+import type { RawRewind } from "@/lib/rewind-raw";
 import { computeRewind } from "@/lib/rewind-utils";
-import { analyzeGithubServer } from "@/lib/rewind-actions";
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isRawRewind(value: unknown): value is RawRewind {
+    if (!isRecord(value)) return false;
+    return (
+        typeof value.year === "number" &&
+        typeof value.generatedAt === "string" &&
+        typeof value.authenticated === "boolean" &&
+        typeof value.isSelf === "boolean" &&
+        typeof value.privateReposIncluded === "boolean" &&
+        isRecord(value.user) &&
+        Array.isArray(value.repos) &&
+        Array.isArray(value.languages) &&
+        Array.isArray(value.events) &&
+        isRecord(value.counts) &&
+        (value.contributions === null || isRecord(value.contributions)) &&
+        (value.comparisonContributions === null || isRecord(value.comparisonContributions)) &&
+        Array.isArray(value.notes)
+    );
+}
 
 const PRIVATE_CONTRIBUTIONS_DOCS =
     "https://docs.github.com/account-and-profile/setting-up-and-managing-your-github-profile/managing-contribution-settings-on-your-profile/viewing-contributions-on-your-profile";
@@ -35,17 +58,39 @@ export class RewindError extends Error {
 }
 
 /**
- * Default: run on the server with our shared token (capped at 2 requests / 5 min / IP).
- * With the user's own token: run in the browser, which never touches the shared quota.
+ * A supplied token is used only in the browser. The shared fallback uses a public,
+ * rate-limited server request and never attaches a server-held GitHub credential.
  */
 export const analyzeGithubClient = async (payload: unknown) => {
     const data = rewindInputSchema.parse(payload);
     if (data.token) {
         return computeRewind(await fetchRewindRaw(data.username, data.year, data.token));
     }
-    const res = await analyzeGithubServer({ username: data.username, year: data.year });
-    if (!res.ok) throw new RewindError(res.code, res.message, res.retryAt);
-    return computeRewind(res.raw);
+
+    const response = await fetch("/api/rewind", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: data.username, year: data.year }),
+    });
+    let result: unknown;
+    try {
+        result = await response.json();
+    } catch {
+        throw new Error("The rewind service returned an invalid response.");
+    }
+
+    if (!response.ok) {
+        const body = isRecord(result) ? result : {};
+        const code = body.code === "INTERNAL_LIMIT" ? "INTERNAL_LIMIT" : "ERROR";
+        throw new RewindError(
+            code,
+            typeof body.error === "string" ? body.error : "Could not fetch GitHub activity.",
+        );
+    }
+    if (!result || !isRecord(result) || !("raw" in result) || !isRawRewind(result.raw)) {
+        throw new Error("The rewind service returned an invalid response.");
+    }
+    return computeRewind(result.raw);
 };
 
 const currentYear = new Date().getUTCFullYear();

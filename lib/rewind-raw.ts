@@ -75,8 +75,10 @@ export type RawRewind = {
     generatedAt: string;
     /** A token (shared or the user's own) was used for the requests. */
     authenticated: boolean;
-    /** The token belongs to the searched user, so private repositories are included. */
+    /** The token belongs to the searched user. */
     isSelf: boolean;
+    /** Private repository details are included in the response. */
+    privateReposIncluded: boolean;
     user: RawUser;
     repos: RawRepo[];
     languages: RawRepoLanguages[];
