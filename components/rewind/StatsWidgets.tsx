@@ -33,17 +33,17 @@ function Stat({
     accent: string;
 }) {
     return (
-        <Panel className="p-4">
+        <Panel className="px-3 py-1.5 sm:px-4 sm:py-2.5">
             <div className="flex items-center justify-between">
-                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                     {label}
                 </span>
                 <Icon className="size-4" style={{ color: accent }} />
             </div>
-            <div className="mt-2 font-mono text-2xl font-semibold tabular-nums sm:text-3xl">
+            <div className="mt-1 font-mono text-xl font-semibold tabular-nums sm:text-2xl">
                 {value}
             </div>
-            {sub ? <p className="mt-1 text-xs text-muted-foreground">{sub}</p> : null}
+            {sub ? <p className="mt-1 text-[11px] text-muted-foreground">{sub}</p> : null}
             <div
                 className="absolute inset-x-0 bottom-0 h-px opacity-70"
                 style={{
@@ -57,7 +57,7 @@ function Stat({
 export function StatsGrid({ data }: { data: RewindData }) {
     const t = data.totals;
     return (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
             <Stat
                 icon={Activity}
                 label="Commits"
@@ -242,6 +242,7 @@ export function ActivityWidget({ data }: { data: RewindData }) {
                 {data.monthly.map((m) => (
                     <div
                         key={m.month}
+                        title={`${m.month} ${data.year}: ${m.contributions.toLocaleString("en-US")} ${data.calendar ? "contributions" : "push commits"}`}
                         className="group flex h-full flex-1 flex-col items-center gap-1.5"
                     >
                         <div className="relative flex w-full flex-1 items-end">
