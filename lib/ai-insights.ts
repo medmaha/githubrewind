@@ -1,4 +1,4 @@
-"server only";
+"use server";
 
 import type { InsightsSummary } from "./rewind-schemas";
 import type { AiInsights } from "./rewind-types";

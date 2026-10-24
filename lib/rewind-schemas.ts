@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-const currentYear = new Date().getUTCFullYear();
+const minYear = 2010
+
+const yearSchema = z.coerce.number().int().min(minYear).refine((value) => {
+    const year = Number(value);
+    const currentYear = new Date().getUTCFullYear();
+    return !Number.isNaN(year) && year <= (currentYear + 1);
+}, `Year must be between ${minYear} and the current year`);
+
 
 export const rewindInputSchema = z.object({
     username: z
@@ -9,7 +16,7 @@ export const rewindInputSchema = z.object({
         .min(1, "Enter a GitHub username")
         .max(39)
         .regex(/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/, "Invalid GitHub username"),
-    year: z.coerce.number().int().min(2008).max(currentYear),
+    year: yearSchema,
     token: z
         .string()
         .trim()
@@ -23,11 +30,7 @@ export const rewindInputSchema = z.object({
 export const insightsInputSchema = z.object({
     summary: z.object({
         login: z.string().max(39),
-        year: z
-            .number()
-            .int()
-            .min(2008)
-            .max(currentYear + 1),
+        year: yearSchema,
         repos: z.number().int().min(0).max(100000),
         commits: z.number().int().min(0).max(1000000),
         prs: z.number().int().min(0).max(1000000),
