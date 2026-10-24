@@ -20,25 +20,7 @@ const _rateLimiters = {
             }),
         ],
     }),
-    insights: arcjet({
-        key: process.env.ARCJET_KEY!,
-        characteristics: ["ip.src"],
-        rules: [
-            shield({ mode }),
-            fixedWindow({
-                mode,
-                window: "600s", // 10 minutes fixed window
-                max: 2, // allow a maximum of 3 requests
-            }),
-        ],
-    }),
 };
-
-export async function enforceInsightsRateLimit(): Promise<InternalLimitResult> {
-    const req = await request();
-    const decision = await _rateLimiters.insights.protect(req);
-    return getInternalLimitResponse(decision);
-}
 
 export async function enforceSharedTokenRateLimit(): Promise<InternalLimitResult> {
     const req = await request();

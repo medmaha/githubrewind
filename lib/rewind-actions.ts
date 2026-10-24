@@ -1,12 +1,9 @@
 "use server";
 
-import { z } from "zod";
-
 import { fetchRewindRaw } from "./github.api";
-import { enforceSharedTokenRateLimit, enforceInsightsRateLimit } from "./rate-limit.server";
-import { generateInsights } from "./ai-insights";
-import { insightsInputSchema, rewindInputSchema } from "./rewind-schemas";
-import type { InternalInsightResult, InternalRewindResult } from "./rewind-types";
+import { enforceSharedTokenRateLimit } from "./rate-limit.server";
+import { rewindInputSchema } from "./rewind-schemas";
+import type { InternalRewindResult } from "./rewind-types";
 
 /**
  * Runs a rewind with OUR token. Capped at 2 requests / 5 min / IP.
@@ -45,25 +42,4 @@ export const analyzeGithubServer = async (payload: unknown): Promise<InternalRew
             retryAt: null,
         };
     }
-};
-
-export const getAiInsightsServer = async (payload: unknown): Promise<InternalInsightResult> => {
-    const data = insightsInputSchema.parse(payload);
-    const limit = await enforceInsightsRateLimit();
-    if (!limit.ok) {
-        return {
-            ok: false,
-            code: "INTERNAL_LIMIT",
-            message:
-                limit.reason === "rate_limit"
-                    ? "AI Insight quota reached (2 requests per 10 minutes)."
-                    : "Request blocked.",
-            retryAt: limit.reason === "rate_limit" ? limit.retryAt : null,
-        };
-    }
-
-    const insights = await generateInsights(
-        data.summary as z.infer<typeof insightsInputSchema>["summary"],
-    );
-    return { ok: true, insights };
 };

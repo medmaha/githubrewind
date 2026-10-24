@@ -121,6 +121,9 @@ export type AiInsights = {
     codingStyle: string;
     personaTitle: string;
     shareCaption: string;
+    achievementEvidence?: string[][];
+    growthEvidence?: string[][];
+    caveat?: string;
 };
 
 export type InternalLimitResult =
@@ -134,10 +137,6 @@ export type InternalLimitResult =
  */
 export type InternalRewindResult =
     | { ok: true; raw: RawRewind }
-    | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
-
-export type InternalInsightResult =
-    | { ok: true; insights: AiInsights }
     | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
 
 export type Chapter = {

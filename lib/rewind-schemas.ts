@@ -29,27 +29,24 @@ export const rewindInputSchema = z.object({
         .or(z.literal("")),
 });
 
-/** Only aggregate, non-sensitive numbers are ever sent to the AI model. */
 export const insightsInputSchema = z.object({
-    summary: z.object({
-        login: z.string().max(39),
-        year: yearSchema,
-        repos: z.number().int().min(0).max(100000),
-        commits: z.number().int().min(0).max(1000000),
-        prs: z.number().int().min(0).max(1000000),
-        prsMerged: z.number().int().min(0).max(1000000),
-        issues: z.number().int().min(0).max(1000000),
-        reviews: z.number().int().min(0).max(1000000),
-        stars: z.number().int().min(0).max(10000000),
-        followers: z.number().int().min(0).max(10000000),
-        activeDays: z.number().int().min(0).max(366),
-        longestStreak: z.number().int().min(0).max(366),
-        estimatedLinesOfCode: z.number().int().min(0),
-        languages: z.array(z.object({ name: z.string().max(40), percent: z.number() })).max(10),
-        topRepoNames: z.array(z.string().max(120)).max(6),
-        topics: z.array(z.string().max(40)).max(20),
-    }),
+    login: z
+        .string()
+        .trim()
+        .min(1)
+        .max(39)
+        .regex(/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/),
+    year: yearSchema,
+    facts: z
+        .array(
+            z.object({
+                id: z.string().regex(/^f[1-9]\d{0,2}$/),
+                text: z.string().trim().min(1).max(300),
+            }),
+        )
+        .min(1)
+        .max(40),
 });
 
 export type RewindInput = z.infer<typeof rewindInputSchema>;
-export type InsightsSummary = z.infer<typeof insightsInputSchema>["summary"];
+export type InsightsInput = z.infer<typeof insightsInputSchema>;
