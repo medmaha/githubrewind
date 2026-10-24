@@ -48,3 +48,6 @@ next-env.d.ts
 .vinext/
 .wrangler/
 .cloudflare/
+
+
+app/demo/
