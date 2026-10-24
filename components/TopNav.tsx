@@ -12,6 +12,20 @@ const NAV_LINKS = [
     { href: "/insights", label: "Insights" },
 ] as const;
 
+
+const HomeButton = () => {
+    const pathname = usePathname()
+    if (pathname === "/") return null
+
+    return <Link
+        key="/"
+        href="/"
+        className={`px-3 py-2 text-xs font-medium transition-colors hover:bg-elevated bg-elevated/90 rounded-4xl hover:text-foreground"`}
+    >
+        Get Started
+    </Link>
+}
+
 export default function TopNav() {
     const { data, reset } = useRewindStore();
     const pathname = usePathname();
@@ -50,11 +64,10 @@ export default function TopNav() {
                                         key={href}
                                         href={href}
                                         aria-current={active ? "page" : undefined}
-                                        className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
-                                            active
-                                                ? "bg-primary/10 text-primary"
-                                                : "text-muted-foreground hover:bg-elevated hover:text-foreground"
-                                        }`}
+                                        className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${active
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-muted-foreground hover:bg-elevated hover:text-foreground"
+                                            }`}
                                     >
                                         {label}
                                     </Link>
@@ -78,9 +91,12 @@ export default function TopNav() {
                         </GhButton>
                     </div>
                 ) : (
-                    <Chip tone="primary">
-                        <SparklesIcon className="size-3" /> AI powered
-                    </Chip>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <HomeButton />
+                        <Chip tone="primary">
+                            <SparklesIcon className="size-3" /> AI powered
+                        </Chip>
+                    </div>
                 )}
             </div>
         </header>
