@@ -7,8 +7,9 @@ export function Panel({ className, children, ...props }: React.HTMLAttributes<HT
     return (
         <div
             className={cn(
-                "surface relative overflow-hidden p-4 sm:p-5",
-                "transition-colors duration-200 hover:border-border-strong",
+                "surface motion-preset-slide-up-sm relative overflow-hidden p-4 sm:p-5",
+                "transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-lg hover:shadow-black/10",
+                "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
                 className,
             )}
             {...props}
@@ -96,7 +97,7 @@ export function GhButton({
         <Button
             variant={variant === "primary" ? "default" : variant}
             className={cn(
-                "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-transparent text-sm transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                "inline-flex cursor-pointer items-center justify-center gap-2 rounded-md border border-transparent text-sm transition-all duration-200 hover:-translate-y-px active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none",
                 size === "sm" ? "h-8 px-3" : "h-10 px-4",
                 className,
             )}

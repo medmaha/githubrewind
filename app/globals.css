@@ -1,5 +1,6 @@
 /* app/globals.css */
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 /* Primer-inspired GitHub dark theme. */
 
