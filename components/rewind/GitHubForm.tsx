@@ -48,7 +48,8 @@ export const analyzeGithubClient = async (payload: unknown) => {
     return computeRewind(res.raw);
 };
 
-const YEARS = Array.from({ length: 6 }, (_, i) => new Date().getUTCFullYear() - i);
+const currentYear = new Date().getUTCFullYear();
+const YEARS = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
 function minutesUntil(ts: number | null) {
     if (!ts) return null;
