@@ -343,6 +343,13 @@ export function computeRewind(raw: RawRewind): RewindData {
             .slice(0, 6),
         monthly: buildMonthly(events, raw.repos, year, calendar),
         calendar,
+        comparison:
+            raw.comparisonContributions && year > 2010
+                ? {
+                      year: year - 1,
+                      calendar: normalizeCalendar(raw.comparisonContributions, year - 1),
+                  }
+                : null,
         notes,
         events,
     };

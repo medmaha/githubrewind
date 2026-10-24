@@ -204,9 +204,18 @@ query RewindCalendar($login: String!, $from: DateTime!, $to: DateTime!) {
 }`;
 
 /** Full-year contribution data. GraphQL always requires a token. Returned as GitHub sent it. */
-async function fetchContributions(login: string, year: number, token: string) {
+async function fetchContributions(
+    login: string,
+    year: number,
+    token: string,
+    requestedEnd?: string,
+) {
     const now = new Date();
-    const end = year === now.getUTCFullYear() ? now : new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+    const end = requestedEnd
+        ? new Date(requestedEnd)
+        : year === now.getUTCFullYear()
+          ? now
+          : new Date(Date.UTC(year, 11, 31, 23, 59, 59));
     const data = await ghGraphql<Json>(
         CONTRIBUTIONS_QUERY,
         { login, from: `${year}-01-01T00:00:00Z`, to: end.toISOString() },
@@ -215,6 +224,18 @@ async function fetchContributions(login: string, year: number, token: string) {
     const collection = data?.user?.contributionsCollection as RawContributions | undefined;
     if (!collection) throw new Error("no contribution data returned");
     return { viewerLogin: (data?.viewer?.login ?? null) as string | null, collection };
+}
+
+function comparisonPeriodEnd(year: number, now: Date) {
+    if (year !== now.getUTCFullYear()) return new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+
+    const comparisonYear = year - 1;
+    const month = now.getUTCMonth();
+    const day = Math.min(
+        now.getUTCDate(),
+        new Date(Date.UTC(comparisonYear, month + 1, 0)).getUTCDate(),
+    );
+    return new Date(Date.UTC(comparisonYear, month, day, 23, 59, 59));
 }
 
 async function fetchCounts(
@@ -291,6 +312,21 @@ export async function fetchRewindRaw(
               "Contribution calendar",
           )
         : null;
+    const comparisonContributions =
+        token && contributions && year > 2010 && year <= new Date().getUTCFullYear()
+            ? await safe(
+                  () =>
+                      fetchContributions(
+                          login,
+                          year - 1,
+                          token,
+                          comparisonPeriodEnd(year, new Date()).toISOString(),
+                      ),
+                  null,
+                  notes,
+                  "Previous-year comparison",
+              )
+            : null;
     const isSelf = Boolean(
         contributions?.viewerLogin &&
         contributions.viewerLogin.toLowerCase() === login.toLowerCase(),
@@ -317,6 +353,7 @@ export async function fetchRewindRaw(
         events,
         counts,
         contributions: contributions?.collection ?? null,
+        comparisonContributions: comparisonContributions?.collection ?? null,
         notes,
     };
 }

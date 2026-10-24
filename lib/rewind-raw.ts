@@ -83,6 +83,7 @@ export type RawRewind = {
     events: RawEvent[];
     counts: RawCounts;
     contributions: RawContributions | null;
+    comparisonContributions: RawContributions | null;
     /** Fetch-time problems only (a request failed). Derived notes are added by the client. */
     notes: string[];
 };

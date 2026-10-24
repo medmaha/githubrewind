@@ -105,6 +105,8 @@ export type RewindData = {
     monthly: MonthlyPoint[];
     /** Full-year GraphQL contribution calendar. null when no token / request failed. */
     calendar: CalendarData | null;
+    /** Previous year's calendar, fetched for the same elapsed period when the selected year is current. */
+    comparison: { year: number; calendar: CalendarData } | null;
     achievements: Achievement[];
     notes: string[];
     events: any;
@@ -138,7 +140,16 @@ export type InternalInsightResult =
     | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
 
 export type Chapter = {
-    id: "opening" | "rhythm" | "busiest" | "quiet" | "comeback" | "project" | "ending";
+    id:
+        | "opening"
+        | "rhythm"
+        | "busiest-month"
+        | "standout-day"
+        | "busiest"
+        | "quiet"
+        | "comeback"
+        | "project"
+        | "ending";
     title: string;
     /** One factual sentence. Everything here is computed from the calendar, never AI-written. */
     headline: string;
