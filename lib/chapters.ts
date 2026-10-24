@@ -1,12 +1,11 @@
+import { format, parseISO } from "date-fns";
+
 import { mondayIndex, toWeeks } from "./rewind-utils";
 import type { CalendarWeek, Chapter, RewindData } from "./rewind-types";
 
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-const parse = (date: string) => new Date(`${date}T00:00:00Z`);
-
-export const fmtDay = (date: string) =>
-    parse(date).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+export const fmtDay = (date: string) => format(parseISO(date), "MMM d");
 
 const fmtSpan = (a: string, b: string) => `${fmtDay(a)} – ${fmtDay(b)}`;
 const nf = (n: number) => n.toLocaleString("en-US");
@@ -96,14 +95,10 @@ export function buildChapters(data: RewindData): Chapter[] {
         const busiestMonth = [...monthTotals.entries()].reduce((best, entry) =>
             entry[1] > best[1] ? entry : best,
         );
-        const [year, month] = busiestMonth[0].split("-").map(Number);
         const monthDays = days.filter((day) => day.date.startsWith(busiestMonth[0]));
         const start = monthDays[0]!.date;
         const end = monthDays[monthDays.length - 1]!.date;
-        const monthName = new Date(Date.UTC(year!, month! - 1, 1)).toLocaleDateString("en-US", {
-            month: "long",
-            timeZone: "UTC",
-        });
+        const monthName = format(parseISO(`${busiestMonth[0]}-01`), "MMMM");
         chapters.push({
             id: "busiest-month",
             title: "Your busiest month",

@@ -11,10 +11,12 @@ function activeDays(calendar: CalendarData) {
 
 function ComparisonRow({
     label,
+    description,
     previous,
     current,
 }: {
     label: string;
+    description: string;
     previous: number;
     current: number;
 }) {
@@ -31,7 +33,13 @@ function ComparisonRow({
 
     return (
         <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-lg bg-(--elevated)/60 px-3 py-2.5">
-            <span className="text-sm text-muted-foreground">{label}</span>
+            <span
+                title={`${label}: ${description}`}
+                className="min-w-0 text-sm text-muted-foreground"
+            >
+                <span className="block">{label}</span>
+                <span className="block text-[10px] leading-tight">{description}</span>
+            </span>
             <span className="font-mono text-sm tabular-nums">{nf(previous)}</span>
             <span className="font-mono text-sm tabular-nums">{nf(current)}</span>
             <Chip tone={tone}>
@@ -64,26 +72,40 @@ export function YearComparison({ data }: { data: RewindData }) {
     const rows = [
         {
             label: "Contributions",
+            description: "Total activity counted on your GitHub calendar.",
             previous: previous.totalContributions,
             current: current.totalContributions,
         },
         {
             label: "Commits",
+            description: "Commits GitHub recorded for the year.",
             previous: previous.breakdown.commits,
             current: current.breakdown.commits,
         },
         {
             label: "Pull requests",
+            description: "Pull request contributions recorded by GitHub.",
             previous: previous.breakdown.prs,
             current: current.breakdown.prs,
         },
         {
             label: "Reviews",
+            description: "Pull request reviews submitted.",
             previous: previous.breakdown.reviews,
             current: current.breakdown.reviews,
         },
-        { label: "Issues", previous: previous.breakdown.issues, current: current.breakdown.issues },
-        { label: "Active days", previous: activeDays(previous), current: activeDays(current) },
+        {
+            label: "Issues",
+            description: "Issue contributions recorded by GitHub.",
+            previous: previous.breakdown.issues,
+            current: current.breakdown.issues,
+        },
+        {
+            label: "Active days",
+            description: "Days with at least one calendar contribution.",
+            previous: activeDays(previous),
+            current: activeDays(current),
+        },
     ];
 
     return (

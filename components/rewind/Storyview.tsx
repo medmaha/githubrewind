@@ -1,5 +1,6 @@
 "use client";
 
+import { format, parseISO } from "date-fns";
 import { useMemo } from "react";
 import { BookOpen, ExternalLink } from "lucide-react";
 
@@ -84,7 +85,9 @@ function WeekRibbon({ calendar, chapter }: { calendar: CalendarData; chapter: Ch
                                 opacity: dim ? 0.18 : 1,
                             }}
                         >
-                            <title>{`${b.start} – ${b.end}: ${b.total}`}</title>
+                            <title>
+                                {`${format(parseISO(b.start), "MMM d")} to ${format(parseISO(b.end), "MMM d")} - ${format(parseISO(b.start), "yyyy")} - (${b.total} Contributions)`}
+                            </title>
                         </rect>
                     );
                 })}
@@ -114,7 +117,11 @@ function WeekdayChart({ chapter }: { chapter: Chapter }) {
     return (
         <div className="grid grid-cols-7 gap-2" role="img" aria-label="Contributions by weekday">
             {values.map((v, i) => (
-                <div key={WEEKDAY_LABELS[i]} className="flex flex-col items-center gap-1">
+                <div
+                    key={WEEKDAY_LABELS[i]}
+                    title={`${WEEKDAY_LABELS[i]}: ${v.toLocaleString("en-US")} contributions`}
+                    className="flex flex-col items-center gap-1"
+                >
                     <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
                         {v}
                     </span>
