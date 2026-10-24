@@ -3,6 +3,9 @@
   "version": "0.1.1",
   "description": "Get your GitHub activity for any year",
   "type": "module",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Mahammed Touray @github.com/medmaha",
   "scripts": {
     "dev": "next dev --turbopack",
     "start": "next start",
@@ -12,11 +15,8 @@
     "dev:vinext": "vite dev --port 3000",
     "build:vinext": "vite build",
     "start:vinext": "vite preview --port 3000",
-    "deploy:vinext": "vinext-cloudflare deploy"
+    "deploy:vinext": "wrangler deploy"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@arcjet/next": "1.10.0",
     "@google/generative-ai": "^0.24.1",
