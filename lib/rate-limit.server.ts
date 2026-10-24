@@ -1,12 +1,12 @@
 "use server";
 
-import arcjet, { fixedWindow, request, shield } from "@arcjet/next";
+import arcjet, { ArcjetDecision, fixedWindow, request, shield } from "@arcjet/next";
 
 import type { InternalLimitResult } from "./rewind-types";
 
 const mode = process.env.NODE_ENV === "production" ? "LIVE" : "DRY_RUN";
 
-const rateLimiters = {
+const _rateLimiters = {
     // We're using our internal API key because GitHub rate-limits its free requests.
     api: arcjet({
         key: process.env.ARCJET_KEY!,
@@ -27,44 +27,26 @@ const rateLimiters = {
             shield({ mode }),
             fixedWindow({
                 mode,
-                window: "600s", // 5 minutes fixed window
+                window: "600s", // 10 minutes fixed window
                 max: 2, // allow a maximum of 3 requests
             }),
         ],
     }),
 };
 
-export async function enforceInsightsRateLimit() {
+export async function enforceInsightsRateLimit(): Promise<InternalLimitResult> {
     const req = await request();
-    const decision = await rateLimiters.insights.protect(req);
-    if (decision.isDenied()) {
-        if (decision.reason.isRateLimit()) {
-            const ttl = decision.ttl;
-            let msg = "You've hit the rate limit. Please try again in 2 minutes.";
-            if (ttl) {
-                const resetAt = new Date(ttl);
-                const resetTime = resetAt.toLocaleTimeString([], {
-                    hour: "numeric",
-                    minute: "2-digit",
-                });
-                const diffMs = Math.max(resetAt.getTime() - Date.now(), 0);
-                const minutes = Math.ceil(diffMs / 60000);
-                const timeText =
-                    minutes > 0 ? `${minutes} minute${minutes === 1 ? "" : "s"}` : "a moment";
-
-                msg = `You've hit the rate limit. Please try again in ${timeText} (at ${resetTime}).`;
-            }
-
-            throw new Error(msg);
-        } else {
-            throw new Error("Forbidden");
-        }
-    }
+    const decision = await _rateLimiters.insights.protect(req);
+    return getInternalLimitResponse(decision);
 }
 
 export async function enforceSharedTokenRateLimit(): Promise<InternalLimitResult> {
     const req = await request();
-    const decision = await rateLimiters.api.protect(req);
+    const decision = await _rateLimiters.api.protect(req);
+    return getInternalLimitResponse(decision);
+}
+
+const getInternalLimitResponse = (decision: ArcjetDecision): InternalLimitResult => {
     if (!decision.isDenied()) return { ok: true };
 
     if (decision.reason.isRateLimit()) {
@@ -77,4 +59,4 @@ export async function enforceSharedTokenRateLimit(): Promise<InternalLimitResult
         };
     }
     return { ok: false, reason: "forbidden" };
-}
+};

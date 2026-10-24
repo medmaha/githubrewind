@@ -133,6 +133,10 @@ export type InternalRewindResult =
     | { ok: true; raw: RawRewind }
     | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
 
+export type InternalInsightResult =
+    | { ok: true; insights: AiInsights }
+    | { ok: false; code: "INTERNAL_LIMIT" | "ERROR"; message: string; retryAt: number | null };
+
 export type Chapter = {
     id: "opening" | "rhythm" | "busiest" | "quiet" | "comeback" | "project" | "ending";
     title: string;

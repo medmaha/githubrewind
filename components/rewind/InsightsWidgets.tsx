@@ -44,7 +44,10 @@ export function InsightsPanel({ data }: { data: RewindData }) {
         startInsights();
         try {
             const result = await getAiInsightsServer({ summary: toSummary(data) });
-            setInsights(result);
+            if (!result.ok) {
+                throw new Error(result.message);
+            }
+            setInsights(result.insights);
             toast.success("AI insights generated");
         } catch (error) {
             const message = (error as Error).message || "Could not generate insights";
