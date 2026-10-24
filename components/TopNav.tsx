@@ -12,19 +12,20 @@ const NAV_LINKS = [
     { href: "/insights", label: "Insights" },
 ] as const;
 
-
 const HomeButton = () => {
-    const pathname = usePathname()
-    if (pathname === "/") return null
+    const pathname = usePathname();
+    if (pathname === "/") return null;
 
-    return <Link
-        key="/"
-        href="/"
-        className={`px-3 py-2 text-xs font-medium transition-colors hover:bg-elevated bg-elevated/90 rounded-4xl hover:text-foreground"`}
-    >
-        Get Started
-    </Link>
-}
+    return (
+        <Link
+            key="/"
+            href="/"
+            className={`px-3 py-2 text-xs font-medium transition-colors hover:bg-elevated bg-elevated/90 rounded-4xl hover:text-foreground"`}
+        >
+            Get Started
+        </Link>
+    );
+};
 
 export default function TopNav() {
     const { data, reset } = useRewindStore();
@@ -64,10 +65,11 @@ export default function TopNav() {
                                         key={href}
                                         href={href}
                                         aria-current={active ? "page" : undefined}
-                                        className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${active
-                                            ? "bg-primary/10 text-primary"
-                                            : "text-muted-foreground hover:bg-elevated hover:text-foreground"
-                                            }`}
+                                        className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
+                                            active
+                                                ? "bg-primary/10 text-primary"
+                                                : "text-muted-foreground hover:bg-elevated hover:text-foreground"
+                                        }`}
                                     >
                                         {label}
                                     </Link>
