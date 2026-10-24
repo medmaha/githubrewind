@@ -20,16 +20,16 @@ export default function PageData() {
         <div className="space-y-4">
             <ProfileWidget data={data} />
             <StatsGrid data={data} />
-            <YearComparison data={data} />
-            <CoveragePanel data={data} />
             <div className="grid gap-4 lg:grid-cols-2">
                 <LanguagesWidget data={data} />
                 <ActivityWidget data={data} />
                 <ReposWidget data={data} />
                 <AchievementsWidget data={data} />
             </div>
+            <YearComparison data={data} />
+            <CoveragePanel data={data} />
             {data.notes.length ? (
-                <Panel>
+                <Panel className="border-primary/50 border-2">
                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                         Data notes
                     </p>
