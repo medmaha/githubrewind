@@ -68,9 +68,9 @@ export async function generateInsights(summary: InsightsSummary): Promise<AiInsi
             response && typeof response === "object" && "status" in response
                 ? response.status
                 : undefined;
+        console.error(`AI gateway failed [${status ?? ""}] [${response?.toString()}]`);
         if (response instanceof Error && status === undefined) throw response;
 
-        console.error(`AI gateway failed [${status ?? "unknown"}]`);
         if (status === 429) throw new Error("AI is busy right now. Please retry in a moment.");
         if (status === 402) throw new Error("AI credits exhausted for this workspace.");
         throw new Error(`AI request failed (${status ?? "unknown"}).`);
