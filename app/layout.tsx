@@ -3,10 +3,12 @@ import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteShell } from "@/components/SiteShell";
 
+const currentYear = new Date().getFullYear()
+
 export const metadata: Metadata = {
     title: process.env.NODE_ENV === "development" ? "DEV | Rewind-Github" : "Rewind-Github",
     description:
-        "Get your own GithubRewind card with AI insights? This fun and interactive tool allows you to showcase your coding journey in 2024",
+        `Get your own GithubRewind card with AI insights? This fun and interactive tool allows you to showcase your coding journey in ${currentYear}`,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
