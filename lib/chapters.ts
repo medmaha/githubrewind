@@ -41,7 +41,10 @@ export function buildChapters(data: RewindData): Chapter[] {
     });
 
     const span = (a: CalendarWeek, b: CalendarWeek = a) => ({ from: a.start, to: b.end });
-    const evidence = (a: CalendarWeek, b: CalendarWeek = a) => ({
+    const evidence = (
+        a: Pick<CalendarWeek, "start" | "end">,
+        b: Pick<CalendarWeek, "start" | "end"> = a,
+    ) => ({
         label: `Activity ${fmtSpan(a.start, b.end)}`,
         url: profileLink(login, a.start, b.end),
     });
@@ -83,6 +86,53 @@ export function buildChapters(data: RewindData): Chapter[] {
         });
     }
 
+    // A month and a single day make the yearly pattern concrete and easy to verify.
+    {
+        const monthTotals = new Map<string, number>();
+        for (const day of days) {
+            const month = day.date.slice(0, 7);
+            monthTotals.set(month, (monthTotals.get(month) ?? 0) + day.count);
+        }
+        const busiestMonth = [...monthTotals.entries()].reduce((best, entry) =>
+            entry[1] > best[1] ? entry : best,
+        );
+        const [year, month] = busiestMonth[0].split("-").map(Number);
+        const monthDays = days.filter((day) => day.date.startsWith(busiestMonth[0]));
+        const start = monthDays[0]!.date;
+        const end = monthDays[monthDays.length - 1]!.date;
+        const monthName = new Date(Date.UTC(year!, month! - 1, 1)).toLocaleDateString("en-US", {
+            month: "long",
+            timeZone: "UTC",
+        });
+        chapters.push({
+            id: "busiest-month",
+            title: "Your busiest month",
+            headline: `${monthName} had the most contributions of any month (${nf(busiestMonth[1])}).`,
+            detail: `That is ${fmtSpan(start, end)} on your contribution calendar.`,
+            stat: { value: nf(busiestMonth[1]), label: `contributions in ${monthName}` },
+            range: { from: start, to: end },
+            evidence: [evidence({ start, end })],
+        });
+    }
+
+    {
+        const peak = days.reduce((best, day) => (day.count > best.count ? day : best));
+        chapters.push({
+            id: "standout-day",
+            title: "Your standout day",
+            headline: `${fmtDay(peak.date)} was your biggest day, with ${plural(peak.count, "contribution")}.`,
+            detail: "The count comes from your contribution calendar and may include commits, pull requests, reviews, and issues.",
+            stat: { value: nf(peak.count), label: "contributions in one day" },
+            range: { from: peak.date, to: peak.date },
+            evidence: [
+                {
+                    label: `Check ${fmtDay(peak.date)} on GitHub`,
+                    url: profileLink(login, peak.date, peak.date),
+                },
+            ],
+        });
+    }
+
     // 3. Busiest week ----------------------------------------------------------------------
     if (weeks.length >= 2) {
         let best = weeks[0]!;
@@ -94,7 +144,7 @@ export function buildChapters(data: RewindData): Chapter[] {
             id: "busiest",
             title: "Your busiest week",
             headline: `The week of ${fmtSpan(best.start, best.end)} was your busiest, with ${plural(best.total, "contribution")}.`,
-            detail: `The peak day was ${fmtDay(peak.date)} with ${nf(peak.count)}.`,
+            detail: `That week included ${fmtDay(peak.date)}, your busiest individual day (${plural(peak.count, "contribution")}).`,
             stat: { value: nf(best.total), label: "contributions in one week" },
             range: span(best),
             evidence: [evidence(best)],

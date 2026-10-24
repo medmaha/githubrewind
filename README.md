@@ -7,7 +7,8 @@ It is a personal project, not an official GitHub product. It is released under t
 ## What it does
 
 - Summarizes a profile, repositories, commits, pull requests, issues, reviews, stars, languages, and activity streaks.
-- Builds a contribution calendar and factual story chapters when a calendar is available.
+- Compares contribution-calendar activity with the previous year, using the same year-to-date period for the current year.
+- Builds specific, verifiable story chapters from the contribution calendar, including standout days and busiest months.
 - Generates an optional AI year-in-review, a PNG highlight card, and share captions.
 - Saves your latest rewind in your browser so you can return to it after a reload.
 - Includes a page where you can inspect and clear the data GithubRewind has saved in that browser.
@@ -17,12 +18,12 @@ It is a personal project, not an official GitHub product. It is released under t
 
 After you run a rewind, the navigation links take you to:
 
-| Page        | What you will find                                                          |
-| ----------- | --------------------------------------------------------------------------- |
-| `/rewind`   | Profile, activity totals, repositories, languages, and achievements         |
-| `/stories`  | Chapters computed from the contribution calendar, with links back to GitHub |
-| `/insights` | Optional AI recap, downloadable highlight card, and share captions          |
-| `/_data`    | A view of the saved browser record and a control to clear it                |
+| Page        | What you will find                                                                  |
+| ----------- | ----------------------------------------------------------------------------------- |
+| `/rewind`   | Profile, activity totals, repositories, languages, and achievements                 |
+| `/stories`  | Factual chapters computed from the contribution calendar, with links back to GitHub |
+| `/insights` | Optional AI recap, downloadable highlight card, and share captions                  |
+| `/_data`    | A view of the saved browser record and a control to clear it                        |
 
 ## Run it locally
 
@@ -62,6 +63,7 @@ You can use your own fine-grained GitHub token in the form instead of configurin
 GitHub does not expose every kind of activity through one API. What GithubRewind can show depends on the selected year, the available GitHub endpoints, the token used, and GitHub contribution visibility settings.
 
 - The full-year contribution calendar needs an authenticated GitHub request. Without it, the app falls back to the public events feed, which only covers roughly the last 90 days.
+- Year-over-year comparisons and story chapters need the contribution calendar. When rewinding the current year, the comparison uses the same dates from the previous year rather than comparing a partial year with a full one.
 - Private contributions appear only when GitHub makes them visible in the profile contribution calendar. Private repository details are only fetched when the token belongs to the account being analyzed.
 - Some totals use GitHub search results or public events and may not line up perfectly with the contribution calendar.
 - Lines of code is a rough estimate based on repository size, not a count of lines changed during the selected year.
