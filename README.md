@@ -23,7 +23,7 @@ After you run a rewind, the navigation links take you to:
 | `/rewind`   | Profile, activity totals, repositories, languages, and achievements                 |
 | `/stories`  | Factual chapters computed from the contribution calendar, with links back to GitHub |
 | `/insights` | Optional AI recap, downloadable highlight card, and share captions                  |
-| `/_data`    | A view of the saved browser record and a control to clear it                        |
+| `/d`    | A view of the saved browser record and a control to clear it                        |
 
 ## Run it locally
 
