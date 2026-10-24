@@ -28,6 +28,7 @@ yarn-error.log*
 # local env files
 .env
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -43,3 +44,7 @@ next-env.d.ts
 # dev zip files 
 *.zip
 *.zip.*
+/dist/
+.vinext/
+.wrangler/
+.cloudflare/
